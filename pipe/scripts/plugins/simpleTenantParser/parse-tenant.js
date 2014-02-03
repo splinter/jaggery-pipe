@@ -1,31 +1,36 @@
-var TENANT_URL_PATTERN='/{context}/t/{tenantId}/{resource}';
-var PARAM_IS_TENANT='isTenant';
-var PARAM_TENANT_ID='tenantId';
-var DEFAULT_SUPER_TENANT_ID='carbon.super';
+var PARAM_TENANT_ID = 'tenantId';
+var TENANT_URL_TOKEN='t';
+var SUPER_TENANT='carbon.super';
 
 /*
 This plug-in is used to obtain the tenant details if any is present.
 It looks for the t symbol in the url to check for a tenant
  */
 var handle=function(req,res,session,handlers){
-     log.info('Parsing request uri');
+    //Break the request uri into components
+    var uriComponents = req.getRequestURI().split('/');
+    var tenantId = null;
 
-     var uriMatcher=new URIMatcher(req.getRequestURI());
-     log.info('Request: '+req.getRequestURI());
-     log.info('Match '+TENANT_URL_PATTERN);
+    //Find the t component
+    for (var index = 0; ((index < uriComponents.length) && (tenantId == null)); index++) {
 
-     //If there is a uri match then this is a tenant
-     if(uriMatcher.match(TENANT_URL_PATTERN)){
-           log.info('Tenant: '+uriMatcher.tenantId);
-           session.put(PARAM_IS_TENANT,true);
-           session.get(PARAM_TENANT_ID,matcher.tenantId);
-     }
-    else{
-         session.put(PARAM_TENANT_ID,DEFAULT_SUPER_TENANT_ID);
-     }
+        //Detected the tenant flag
+        if (uriComponents[index] == TENANT_URL_TOKEN) {
+            //The next component should be the tenantId
+            tenantId = uriComponents[index + 1];
+        }
+    }
 
-    log.info('Tenant: '+session.get(PARAM_TENANT_ID));
+    //If a tenant is not present then the request is directed
+    //at the super tenant
+    if (!tenantId) {
+        tenantId = SUPER_TENANT;
+    }
 
-     handlers();
+    log.info('Tenant ID is : '+tenantId);
+
+    session.put(PARAM_TENANT_ID,tenantId);
+
+    handlers();
 
 };
