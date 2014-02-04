@@ -214,9 +214,18 @@ var pipes = {};
         return;
     };
 
+    /*
+    The function is used to initialize the pipe by calling an init method found in the object
+     */
+    var init=function(obj){
+        if(obj.hasOwnProperty('init')){
+            obj.init(this);
+        }
+    }
+
     pipes.handle = handle;
     pipes.plug = install;
     pipes.override = override;
     pipes.listAllHandlers = debugListAllHandlers;
-
+    pipes.init=init;
 }());
