@@ -1,0 +1,26 @@
+<%
+
+    var pipe=require('pipe');
+    var log=new Log();
+    var router= require('/extensions/universal/simpleRouter.js');
+    var asset=require('/routes/asset.js');
+    var basicAuth=require('/extensions/universal/basicAuth.js');
+
+    pipe.pipes.plug(require('/extensions/universal/simpleRequestLogger.js'));
+    pipe.pipes.plug(require('/extensions/universal/simpleTenantParser.js'));
+    //pipe.pipes.plug('/asset/',basicAuth);   //Apply basic auth to routes starting with /asset/
+    pipe.pipes.plug(router);
+
+    router.app.get(['/{context}/asset/{type}/{id}','/{context}/asset/t/{tenant}/asset/{type}/{id}'],asset.getAsset);
+    router.app.put(['/{context}/asset/{type}/{id}','/{context}/asset/t/{tenant}/asset/{type}/{id}'],asset.updateAsset);
+    router.app.delete(['/{context}/asset/{type}/{id}','/{context}/asset/t/{tenant}/asset/{type}/{id}'],asset.deleteAsset);
+    router.app.post(['/{context}/asset/{type}/{id}','/{context}/asset/t/{tenant}/asset/{type}/{id}'],asset.createAsset);
+
+    router.app.get('/{context}/topassets',asset.topSuperTenantAsset);
+    router.app.get('/{context}/t/{tenant}/topassets',asset.topTenantAsset);
+
+    //router.app.get('/{context}/topassets',asset.overridenSuperTenantAsset);
+
+
+    pipe.pipes.handle(request,response,session);
+%>
