@@ -5,8 +5,8 @@ var app = {};
 var handle = function (req, res, session, handlers) {
     var log = new Log();
     log.info('Executing the simple-routing logic');
-    var routed = app.route(req, res, session);
-    if (!routed) {
+    var data = app.route(req, res, session);
+    if (!data) {
         log.info('Route not handled');
         handlers({code: 401});
     }
@@ -89,6 +89,7 @@ var exec = (function () {
         //Find the route to override
         for (var route in methodRouteMappings) {
             routeMapping=methodRouteMappings[route];
+
             if (route == originalRoute) {
                 //Check if overrides exist
                 if (!routeMapping.hasOwnProperty('overrides')) {
@@ -97,7 +98,6 @@ var exec = (function () {
                 var entry={};
                 entry['route']=newRoute;
                 entry['handle']=obj;
-
                 routeMapping.overrides.push(entry);
             }
         }
@@ -147,47 +147,41 @@ var exec = (function () {
     var resolveOverride=function(req,res,session,routeMapping,uriMatcher){
         var overrides=routeMapping.overrides;
         var currentRoute;
-
-        log.info(stringify(overrides));
+        var result=null;
         for(var index in overrides){
+
             currentRoute=overrides[index].route;
-            log.info('current route:' +stringify(currentRoute));
             if(uriMatcher.match(currentRoute)){
-                log.info('Found override mapping');
-                 return routeMapping.overrides[index].handle(req,res,{session:session,arguments:uriMatcher.elements()});
+                result=routeMapping.overrides[index].handle(req,res,{session:session,arguments:uriMatcher.elements()})||{};
+                return result;
             }
         }
 
-        return null;
+        return result;
     };
 
     app.route = function (req, res, session) {
         //Determine the type of method
         var method = req.getMethod();
-        var data;
+        var data=null;
         var routeMappings = routes[method];
         var uriMatcher = new URIMatcher(req.getRequestURI());
-        log.info('Routing request: ' + req.getRequestURI());
 
         for (var route in routeMappings) {
 
             //Check if the route matches
             if (uriMatcher.match(route)) {
 
-                log.info('arguments: ');
-                log.info(uriMatcher.elements());
-                log.info('***********');
-
                 //Check if there are any overrides to match against
                 if(routeMappings[route].hasOwnProperty('overrides'))
                 {
-
                     data=resolveOverride(req,res,session,routeMappings[route],uriMatcher);
                 }
 
+                //If an override is not used then
                 if(!data){
                     //If there are no overrides use the default
-                    routeMappings[route].handle(req, res, {session: session, arguments: uriMatcher.elements()});
+                    data=routeMappings[route].handle(req, res, {session: session, arguments: uriMatcher.elements()})||{};
                 }
 
                 return true;
