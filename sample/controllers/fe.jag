@@ -2,7 +2,9 @@
 
     var pipe=require('pipe');
     var log=new Log();
+    log.info('Starting intialization');
     var router= require('/extensions/universal/simpleRouter.js');
+    var caramelRenderer=require('/extensions/universal/caramelRenderer.js');
     var asset=require('/routes/asset.js');
     var api=require('/routes/api.js');
     var basicAuth=require('/extensions/universal/basicAuth.js');
@@ -11,9 +13,10 @@
 
 
     pipe.pipes.plug(require('/extensions/universal/simpleTenantParser.js'));
-    //pipe.pipes.plug('/asset/',basicAuth);   //Apply basic auth to routes starting with /asset/
+    pipe.pipes.plug('/asset/',basicAuth);   //Apply basic auth to routes starting with /asset/
     pipe.pipes.plug(router);
     pipe.pipes.plug(errHandler);
+
 
 
     errHandler.environment='production';
@@ -28,9 +31,11 @@
 
     router.app.overrideGet('/{context}/topassets/{type}','/{context}/topassets/api',api.apiTopAssets);
 
-    //router.app.get('/{context}/topassets',asset.overridenSuperTenantAsset);
+   // router.app.get('/{context}/topassets',asset.overridenSuperTenantAsset);
 
 
     pipe.pipes.handle(request,response,session);
+   // var caramel=require('caramel');
+   // caramel.render({});
 
 %>

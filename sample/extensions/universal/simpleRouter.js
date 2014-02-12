@@ -12,6 +12,10 @@ var handle = function (req, res, session, handlers) {
         handlers({code: 401});
     }
 
+    log.info('About to start rendering..');
+    var cRenderer=require('/extensions/universal/caramelRenderer.js');
+    cRenderer.render({},res,session);
+
     handlers();
 };
 
