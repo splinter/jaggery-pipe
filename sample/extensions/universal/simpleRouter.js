@@ -9,12 +9,12 @@ var handle = function (req, res, session, handlers) {
     var data = app.route(req, res, session);
     if (!data) {
         log.info('Route not handled');
-        handlers({code: 401});
+        handlers({code: 404,msg:'Requested resource not found!'});
     }
 
-    //log.info('About to start rendering..');
-    //var cRenderer=require('/extensions/universal/caramelRenderer.js');
-    //cRenderer.render({},res,session);
+    log.info('About to start rendering..');
+    var cRenderer=require('/extensions/universal/caramelRenderer.js');
+    cRenderer.render({},'asset');
 
     handlers();
 };

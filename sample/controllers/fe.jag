@@ -14,7 +14,7 @@
 
 
     pipe.pipes.plug(require('/extensions/universal/simpleTenantParser.js'));
-    pipe.pipes.plug('/asset/',basicAuth);   //Apply basic auth to routes starting with /asset/
+    //pipe.pipes.plug('/asset/',basicAuth);   //Apply basic auth to routes starting with /asset/
     pipe.pipes.plug(router);
     pipe.pipes.plug(errHandler);
 

@@ -1,7 +1,7 @@
-var render=function(data,res,session){
+var render=function(data,viewId){
     var log=new Log();
     var caramel=require('caramel');
-    print('==========================');
+    print('View Id: '+viewId);
     caramel.render(data);
 
 };

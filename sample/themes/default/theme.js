@@ -2,7 +2,10 @@ var cache=false;
 
 //var engine = require('caramel').engine('handlebars');
 
-var engine = caramel.engine('handlebars', (function () {
+var engine=caramel.engine('pipe',require('/themes/default/pipe-caramel-engine.js').engine);
+
+
+/*var engine = caramel.engine('handlebars', (function () {
     return {
         partials: function (Handlebars) {
             var theme = caramel.theme();
@@ -22,7 +25,7 @@ var engine = caramel.engine('handlebars', (function () {
                             return;
                         }
                         file.open('r');
-                        Handlebars.registerPartial(prefix.substring(0, prefix.length - 4), file.readAll());
+                        Handlebars.registerPartial(prefix.substring(0, refix.length - 4), file.readAll());
                         file.close();
                     }
                 })('', file);
@@ -52,11 +55,14 @@ var engine = caramel.engine('handlebars', (function () {
         render: function (data, meta) {
             var log=new Log();
             log.info('Entered the render method');
+            log.info(stringify(meta));
             if (request.getParameter('debug') == '1') {
                 response.addHeader("Content-Type", "application/json");
                 print(stringify(data));
             } else {
-                this.__proto__.render.call(this, data, meta);
+
+                require('/themes/default/renderers/asset.js').render(themeFn,data,meta);
+                //this.__proto__.render.call(this, data, meta);
             }
         },
         globals: function (data, meta) {
@@ -65,26 +71,16 @@ var engine = caramel.engine('handlebars', (function () {
             return 'var store = ' + stringify({
                 user: user ? user.username : null
             });
-        }
+        },
+        theme:themeFn
     };
 }()));
 
 
 var resolve= function (path) {
-    var fn, p;
-    log.info('Resolving path');
-    path = (path.charAt(0) !== '/' ? '/' : '') + path;
-    p = this.base() + path;
-    if (new File(p).isExists() || !(this.__proto__ instanceof Theme)) {
-        if (log.isDebugEnabled()) {
-            log.debug('Resolved path : ' + p);
-        }
-        return p;
-    }
-    fn = this.__proto__.base;
-    p = fn ? fn.call(this.__proto__) + path : p;
-    if (log.isDebugEnabled()) {
-        log.debug('Inherited path : ' + p);
-    }
-    return p;
-};
+    var log=new Log();
+    log.info('Path: '+this.__proto__.resolve.call(this, path));
+    return this.__proto__.resolve.call(this, path);
+};    */
+
+
