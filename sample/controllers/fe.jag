@@ -1,56 +1,66 @@
 <%
 
-    var pipe=require('pipe');
-    var log=new Log();
-    var router= require('/extensions/universal/simpleRouter.js');
-    var caramelRenderer=require('/extensions/universal/caramelRenderer.js');
-    var asset=require('/routes/asset.js');
-    var api=require('/routes/api.js');
-    var user=require('/routes/user.js');
-    var document=require('/routes/document.js');
-    var basicAuth=require('/extensions/universal/basicAuth.js');
-    var errHandler= require('/extensions/universal/simpleErrorHandler.js')
-    //pipe.pipes.init(require('/profiles/default.js'));
+var pipe = require('pipe');
+var log = new Log();
+var router = require('/extensions/universal/simpleRouter.js');
+var caramelRenderer = require('/extensions/universal/caramelRenderer.js');
+var asset = require('/routes/asset.js');
+var api = require('/routes/api.js');
+var user = require('/routes/user.js');
+var document = require('/routes/document.js');
+var basicAuth = require('/extensions/universal/basicAuth.js');
+var errHandler = require('/extensions/universal/simpleErrorHandler.js')
+//pipe.pipes.init(require('/profiles/default.js'));
 
 
-    pipe.pipes.plug(require('/extensions/universal/simpleTenantParser.js'));
-    //pipe.pipes.plug('/asset/',basicAuth);   //Apply basic auth to routes starting with /asset/
-    pipe.pipes.plug(router);
-    pipe.pipes.plug(errHandler);
+pipe.pipes.plug(require('/extensions/universal/simpleTenantParser.js'));
+//pipe.pipes.plug('/asset/',basicAuth);   //Apply basic auth to routes starting with /asset/
+pipe.pipes.plug(router);
+pipe.pipes.plug(errHandler);
 
 
-    errHandler.environment='dev';
+errHandler.environment = 'dev';
 
-    router.app.delete('/{context}/user',user.logoutUser);
+router.app.delete('/{context}/user', user.logoutUser);
 
-    //Setup some simple routes
-    router.app.get(['/{context}/t/{tenant}/asset/{type}/top','/{context}/asset/{type}/top'],asset.getTopAssets);
-    router.app.get(['/{context}/t/{tenant}/asset/{type}/{id}','/{context}/asset/{type}/{id}'],asset.getAsset);
+//Setup some simple routes
+router.app.get(['/{context}/t/{tenant}/asset/{type}/top', '/{context}/asset/{type}/top'], asset.getTopAssets);
+router.app.get(['/{context}/t/{tenant}/asset/{type}/{id}', '/{context}/asset/{type}/{id}'], asset.getAsset);
 
-    //The documents are publicly available to anyone,so no basic auth
-    router.app.get('/{context}/document/{type}/{id}',document.getDocument);
-
-
-    //Override the top assets routes for just the APIs into a custom router
-    router.app.overrideGet('/{context}/t/{tenant}/asset/{type}/top','/{context}/t/{tenant}/asset/api/top',api.getTopApis);
-    router.app.overrideGet('/{context}/asset/{type}/top','/{context}/asset/api/top',api.getTopApis);
+//The documents are publicly available to anyone,so no basic auth
+router.app.get('/{context}/document/{type}/{id}', document.getDocument);
 
 
-    //router.app.get(['/{context}/asset/{type}/{id}','/{context}/asset/t/{tenant}/asset/{type}/{id}'],asset.getAsset);
-    //router.app.put(['/{context}/asset/{type}/{id}','/{context}/asset/t/{tenant}/asset/{type}/{id}'],asset.updateAsset);
-    //router.app.delete(['/{context}/asset/{type}/{id}','/{context}/asset/t/{tenant}/asset/{type}/{id}'],asset.deleteAsset);
-    //router.app.post(['/{context}/asset/{type}/{id}','/{context}/asset/t/{tenant}/asset/{type}/{id}'],asset.createAsset);
-
-    //router.app.get('/{context}/topassets/{type}',asset.topSuperTenantAsset);
-    //router.app.get('/{context}/t/{tenant}/topassets/{type}',asset.topTenantAsset);
-
-    //router.app.overrideGet('/{context}/topassets/{type}','/{context}/topassets/api',api.apiTopAssets);
-
-   // router.app.get('/{context}/topassets',asset.overridenSuperTenantAsset);
+//Override the top assets routes for just the APIs into a custom router
+router.app.overrideGet('/{context}/t/{tenant}/asset/{type}/top', '/{context}/t/{tenant}/asset/api/top', api.getTopApis);
+router.app.overrideGet('/{context}/asset/{type}/top', '/{context}/asset/api/top', api.getTopApis);
 
 
-    pipe.pipes.handle(request,response,session);
-   // var caramel=require('caramel');
-   // caramel.render({});
+//router.app.get(['/{context}/asset/{type}/{id}','/{context}/asset/t/{tenant}/asset/{type}/{id}'],asset.getAsset);
+//router.app.put(['/{context}/asset/{type}/{id}','/{context}/asset/t/{tenant}/asset/{type}/{id}'],asset.updateAsset);
+//router.app.delete(['/{context}/asset/{type}/{id}','/{context}/asset/t/{tenant}/asset/{type}/{id}'],asset.deleteAsset);
+//router.app.post(['/{context}/asset/{type}/{id}','/{context}/asset/t/{tenant}/asset/{type}/{id}'],asset.createAsset);
+
+//router.app.get('/{context}/topassets/{type}',asset.topSuperTenantAsset);
+//router.app.get('/{context}/t/{tenant}/topassets/{type}',asset.topTenantAsset);
+
+//router.app.overrideGet('/{context}/topassets/{type}','/{context}/topassets/api',api.apiTopAssets);
+
+// router.app.get('/{context}/topassets',asset.overridenSuperTenantAsset);
+
+
+//pipe.pipes.handle(request,response,session);
+var rm = require('/themes/default/route-map.js');
+
+rm.RouteMap.add('/{context}/asset/{type}/{id}','1');
+rm.RouteMap.add('/{context}/asset/api/{id}','2');
+var match=rm.RouteMap.match(request.getRequestURI());
+
+log.info(rm.RouteMap.map);
+log.info(match);
+
+
+// var caramel=require('caramel');
+// caramel.render({});
 
 %>
