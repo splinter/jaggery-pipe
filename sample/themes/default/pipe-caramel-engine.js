@@ -25,16 +25,20 @@ var engine = (function () {
 
     var render = function (data, meta) {
         log.info('Render method called');
-        //var rm=require('/themes/default/route-map.js');
+        var rm=require('/themes/default/route-map.js');
 
-        //rm.add('/{context}/asset/{type}/{id}');
-
-        //log.info(rm.map);
+        readMappingFile('',rm.RouteMap);
 
         var req=meta.request;
-        //Determine the renderer which needs to be called
+        var uri=req.getRequestURI();
+        var rendererPath=rm.RouteMap.match(uri);
 
-        printArgs(arguments);
+        log.info('Renderer path: '+rendererPath);
+
+        log.info(rm.RouteMap.map);
+
+        //Determine the renderer which needs to be called
+        //printArgs(arguments);
     };
 
     var theme = function (page, contexts, jss, css, code) {
@@ -48,7 +52,15 @@ var engine = (function () {
         }
     };
 
+    var readMappingFile=function(fileName,routeMap){
+        var mapping=require('/themes/default/mapping.json');
 
+        for(var key in mapping){
+            routeMap.add(key,mapping[key]);
+        }
+
+        log.info(mapping);
+    };
 
     return{
         partials: partials,
@@ -56,6 +68,6 @@ var engine = (function () {
         globals: globals,
         init: init,
         render: render
-    }
+    };
 
 }());

@@ -1,9 +1,16 @@
+/**
+ * Description: The script is used to construct route trees given a route pattern.After a route can be stored in the
+ *              RouteMap with a piece of data (or a function) that is reffered to as the reference.At a later time
+ *              a route can matched against any route stored in the map to return the stored reference.
+ * Filename: route-map.js
+ * Created Date: 17/2/2014
+ */
 var RouteMap = {};
 
 var module = (function () {
 
     var map = {};
-    var log = new Log();
+    var log = new Log('route-map');
 
     var add = function (route,ref) {
         splitToComponents(route,ref);
@@ -13,9 +20,6 @@ var module = (function () {
         var components=route.split('/');
         components=cleanseComponents(components);
         var result=traverse(map,components,0);
-        log.info('*** Result ***');
-        log.info(result);
-
         return result;
     };
 
@@ -27,28 +31,20 @@ var module = (function () {
 
     var traverse=function(mapObj,components,index){
         if(components.length<=index){
-             log.info('Getting reference');
-             log.info(mapObj);
              var ref= getRef(mapObj);
-             log.info('ref is '+ref);
             return ref;
         }
         else{
             var comp=components[index];
             index++;
-            log.info('Matching comp: '+comp);
             if(mapObj.hasOwnProperty(comp)){
-                log.info('Match');
                 return traverse(mapObj[comp],components,index);
             }
             else{
-                log.info('Looking for default');
                 var def=getDefaultRoute(mapObj);
-                log.info('def: '+stringify(def));
                 if(!def){
                     return def;
                 }
-
                 return traverse(def,components,index);
             }
         }
@@ -90,6 +86,7 @@ var module = (function () {
         for (var index in components) {
             component = components[index];//removeTokens(components[index]);
 
+            //Ignore any empty components
             if (component != '') {
                 cleansed.push(component);
             }
@@ -134,11 +131,14 @@ var module = (function () {
         return null;
     };
 
+    /**
+     * The method is used to return the reference to the data or function
+     * pointed to by a given route.It accesses the _ref property stored with the route
+     * @param obj An object representing the final level of the route
+     * @returns If a reference is found then it is returned (an object or function),else null
+     */
     var getRef=function(obj){
-       log.info('Get Ref');
-       log.info(obj['_ref']);
        if(obj.hasOwnProperty('_ref')){
-           log.info('Found a ref');
            return obj['_ref'];
        }
         return null;

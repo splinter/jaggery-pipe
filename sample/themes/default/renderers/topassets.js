@@ -1,4 +1,4 @@
 var render=function(theme,data,meta,require){
-    print("Assets page");
+    print("Top assets page");
     //theme('index',{});
 }
