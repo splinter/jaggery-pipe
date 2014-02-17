@@ -11,6 +11,8 @@ var module = (function () {
 
     var map = {};
     var log = new Log('route-map');
+    var PARAM_DEFAULT_ROUTE='';
+    var PARAM_REF='/';
 
     var add = function (route,ref) {
         splitToComponents(route,ref);
@@ -18,9 +20,10 @@ var module = (function () {
 
     var match=function(route){
         var components=route.split('/');
+        var params={};
         components=cleanseComponents(components);
-        var result=traverse(map,components,0);
-        return result;
+        var result=traverse(map,components,0,params);
+        return {params: params, ref:result};
     };
 
     var splitToComponents = function (route,ref) {
@@ -29,23 +32,37 @@ var module = (function () {
         buildMap(map, components, 0,ref);
     };
 
-    var traverse=function(mapObj,components,index){
+    var traverse=function(mapObj,components,index,params){
         if(components.length<=index){
-             var ref= getRef(mapObj);
+            var ref= getRef(mapObj);
             return ref;
         }
         else{
             var comp=components[index];
             index++;
+            var def=getDefaultRoute(mapObj);
+
+            //Save the parameter values only if a default route existed
+            if(def){
+                //Save the corresponding value
+                params[getDefaultRouteName(mapObj)]=comp;
+            }
+
+
             if(mapObj.hasOwnProperty(comp)){
-                return traverse(mapObj[comp],components,index);
+
+                return traverse(mapObj[comp],components,index,params);
             }
             else{
-                var def=getDefaultRoute(mapObj);
+
                 if(!def){
                     return def;
                 }
-                return traverse(def,components,index);
+
+                //Save the corresponding value
+               // params[getDefaultRouteName(mapObj)]=comp;
+
+                return traverse(def,components,index,params);
             }
         }
     };
@@ -53,12 +70,12 @@ var module = (function () {
     var buildMap = function (mapObj, components, index,ref) {
         //Stop building the map if there are no more components to place
         if (components.length <= index) {
-            mapObj['_ref']=ref;
+            mapObj[PARAM_REF]=ref;
             return;
         }
         else {
             var comp = components[index];
-            var cleansed=removeTokens(comp);
+            var cleansed=comp;//removeTokens(comp);
 
             index++;
 
@@ -66,7 +83,7 @@ var module = (function () {
             if (!mapObj.hasOwnProperty(cleansed)) {
                 mapObj[cleansed] = {};
                 if(isToken(comp)){
-                    mapObj['_def']=cleansed;
+                    mapObj[PARAM_DEFAULT_ROUTE]=cleansed;
                 }
             }
             buildMap(mapObj[cleansed], components, index,ref);
@@ -124,12 +141,22 @@ var module = (function () {
     var getDefaultRoute=function(obj){
         var def;
 
-        if(obj.hasOwnProperty('_def')){
-             def=obj['_def'];
+        if(obj.hasOwnProperty(PARAM_DEFAULT_ROUTE)){
+             def=obj[PARAM_DEFAULT_ROUTE];
             return obj[def];
         }
         return null;
     };
+
+    var getDefaultRouteName=function(obj){
+        var def;
+
+        if(obj.hasOwnProperty(PARAM_DEFAULT_ROUTE)){
+              return removeTokens(obj[PARAM_DEFAULT_ROUTE]);
+        }
+
+        return '';
+    }
 
     /**
      * The method is used to return the reference to the data or function
@@ -138,8 +165,8 @@ var module = (function () {
      * @returns If a reference is found then it is returned (an object or function),else null
      */
     var getRef=function(obj){
-       if(obj.hasOwnProperty('_ref')){
-           return obj['_ref'];
+       if(obj.hasOwnProperty(PARAM_REF)){
+           return obj[PARAM_REF];
        }
         return null;
     }
