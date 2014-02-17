@@ -1,10 +1,10 @@
-var getTopApis=function(req,res,context){
-  var tenantId=context.session.get('tenantId');
+var getTopApis=function(req,res,session){
+  var tenantId=session.get('tenantId');
   print('Getting the top apis of '+tenantId);
 };
 
-var getApi=function(){
-  print('Getting api details');
+var getApi=function(req){
+  print('Getting api details '+req._params.id);
 };
 
 var putApi=function(){

@@ -1,5 +1,5 @@
-getDocument=function(req,res,context){
-    var type=context.arguments.type;
-    var id=context.arguments.id;
+getDocument=function(req,res,session){
+    var type=req._params.type;
+    var id=req._params.id;
     print('Getting document of '+type+' for id: '+id);
 };

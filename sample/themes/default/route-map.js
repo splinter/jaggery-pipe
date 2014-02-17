@@ -9,27 +9,32 @@ var RouteMap = {};
 
 var module = (function () {
 
-    var map = {};
+    //var map = {};
     var log = new Log('route-map');
     var PARAM_DEFAULT_ROUTE='';
     var PARAM_REF='/';
 
-    var add = function (route,ref) {
-        splitToComponents(route,ref);
+    function Routes(){
+      this.map={};
+    }
+
+    Routes.prototype.add = function (route,ref) {
+        this.splitToComponents(route,ref);
     };
 
-    var match=function(route){
+    Routes.prototype.match=function(route){
         var components=route.split('/');
         var params={};
         components=cleanseComponents(components);
-        var result=traverse(map,components,0,params);
+        var result=traverse(this.map,components,0,params);
+        log.info(params);
         return {params: params, ref:result};
     };
 
-    var splitToComponents = function (route,ref) {
+    Routes.prototype.splitToComponents = function (route,ref) {
         var components = route.split('/');
         components = cleanseComponents(components);
-        buildMap(map, components, 0,ref);
+        buildMap(this.map, components, 0,ref);
     };
 
     var traverse=function(mapObj,components,index,params){
@@ -48,7 +53,6 @@ var module = (function () {
                 params[getDefaultRouteName(mapObj)]=comp;
             }
 
-
             if(mapObj.hasOwnProperty(comp)){
 
                 return traverse(mapObj[comp],components,index,params);
@@ -58,9 +62,6 @@ var module = (function () {
                 if(!def){
                     return def;
                 }
-
-                //Save the corresponding value
-               // params[getDefaultRouteName(mapObj)]=comp;
 
                 return traverse(def,components,index,params);
             }
@@ -171,9 +172,9 @@ var module = (function () {
         return null;
     }
 
-
-    RouteMap.map = map;
-    RouteMap.add = add;
-    RouteMap.match=match;
+    RouteMap=Routes;
+    //RouteMap.map = map;
+    //RouteMap.add = add;
+    //RouteMap.match=match;
 
 }());

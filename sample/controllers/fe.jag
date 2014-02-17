@@ -21,19 +21,20 @@ pipe.pipes.plug(errHandler);
 
 errHandler.environment = 'dev';
 
-router.app.delete('/{context}/user', user.logoutUser);
+router.app.del('/:context/user', user.logoutUser);
 
 //Setup some simple routes
-router.app.get(['/{context}/t/{tenant}/asset/{type}/top', '/{context}/asset/{type}/top'], asset.getTopAssets);
-router.app.get(['/{context}/t/{tenant}/asset/{type}/{id}', '/{context}/asset/{type}/{id}'], asset.getAsset);
+router.app.get(['/:context/t/:tenant/asset/:type/top', '/:context/asset/:type/top'], asset.getTopAssets);
+router.app.get(['/:context/t/:tenant/asset/:type/:id', '/:context/asset/:type/:id'], asset.getAsset);
 
 //The documents are publicly available to anyone,so no basic auth
-router.app.get('/{context}/document/{type}/{id}', document.getDocument);
+router.app.get('/:context/document/:type/:id', document.getDocument);
 
 
 //Override the top assets routes for just the APIs into a custom router
-router.app.overrideGet('/{context}/t/{tenant}/asset/{type}/top', '/{context}/t/{tenant}/asset/api/top', api.getTopApis);
-router.app.overrideGet('/{context}/asset/{type}/top', '/{context}/asset/api/top', api.getTopApis);
+router.app.get('/:context/asset/api/top', api.getTopApis);
+//router.app.get('/:context/asset/api/:id',api.getApi);
+
 
 
 //router.app.get(['/{context}/asset/{type}/{id}','/{context}/asset/t/{tenant}/asset/{type}/{id}'],asset.getAsset);
@@ -49,15 +50,16 @@ router.app.overrideGet('/{context}/asset/{type}/top', '/{context}/asset/api/top'
 // router.app.get('/{context}/topassets',asset.overridenSuperTenantAsset);
 
 
-//pipe.pipes.handle(request,response,session);
-var rm = require('/themes/default/route-map.js');
+pipe.pipes.handle(request,response,session);
+//var RouteMap = require('/themes/default/route-map.js').RouteMap;
+//var rm=new RouteMap();
 
-rm.RouteMap.add('/:context/asset/:type/:id','1');
-rm.RouteMap.add('/:context/asset/api/:id','2');
-var match=rm.RouteMap.match(request.getRequestURI());
+//rm.add('/:context/asset/:type/:id','1');
+//rm.add('/:context/asset/api/:id','2');
+//var match=rm.match(request.getRequestURI());
 
-log.info(rm.RouteMap.map);
-log.info(match);
+//log.info(rm.map);
+//log.info(match);
 
 
 // var caramel=require('caramel');
