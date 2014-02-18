@@ -7,7 +7,11 @@ var getTopAssets=function(req,res,session){
 
 var getAsset=function(req,res,session){
     var assetId=req._params.id;
-    print('Returning asset details for asset ID: '+assetId);
+    //print('Returning asset details for asset ID: '+assetId);
+    return{
+        id:req._params.id,
+        name:'test-'+req._params.type
+    };
 };
 
 var getAssetSample=function(req,res,session){

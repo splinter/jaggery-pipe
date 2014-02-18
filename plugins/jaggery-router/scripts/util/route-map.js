@@ -52,7 +52,6 @@ var module = (function () {
         var params = {};
         components = cleanseComponents(components);
         var result = traverse(this.map, components, 0, params,new Stack(),this.config);
-        log.info(this.map);
         return {params: params, ref: result};
     };
 
@@ -219,8 +218,5 @@ var module = (function () {
 
     RouteMap = Routes;
     LayerStack = Stack;
-    //RouteMap.map = map;
-    //RouteMap.add = add;
-    //RouteMap.match=match;
 
 }());

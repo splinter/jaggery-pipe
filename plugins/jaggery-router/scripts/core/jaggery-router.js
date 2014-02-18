@@ -2,6 +2,18 @@ var name = 'simpleRouter';
 
 var app = {};
 
+/**
+ * The default renderer will print the data object
+ * @param data
+ * @param req
+ * @param res
+ * @param session
+ */
+var defaultRenderer=function(data,req,res,session){
+    res.addHeader('Content-Type','application/json');
+    print(stringify(data));
+};
+
 var handle = function (req, res, session, handlers) {
     var log = new Log();
     log.info('Executing the simple-routing logic');
@@ -15,8 +27,13 @@ var handle = function (req, res, session, handlers) {
     //log.info('About to start rendering..');
     //var cRenderer=require('/extensions/universal/caramelRenderer.js');
     //cRenderer.render(result.data);
+
+    var renderer=app.utils('renderer')||defaultRenderer;
+    renderer(result.data,req,res,session);
     handlers();
 };
+
+
 
 
 var exec = (function (RouteMap) {
@@ -26,7 +43,9 @@ var exec = (function (RouteMap) {
     var POST_METHOD = 'POST';
     var PUT_METHOD = 'PUT';
     var DELETE_METHOD = 'DELETE';
+    var CONFIG_KEY_RENDERER='renderer';
     var INHERIT_ROUTES=false;
+    var config={};
     var log = new Log();
 
 
@@ -65,6 +84,18 @@ var exec = (function (RouteMap) {
     app.config=function(options){
         INHERIT_ROUTES=options.inheritRoutes||false;
     }
+
+    app.utils=function(key,value){
+
+        if(arguments.length==1){
+            return config[key];
+        }
+        else{
+            config[key]=value;
+        }
+
+    };
+
 
     /**
      * The method is used to register a route

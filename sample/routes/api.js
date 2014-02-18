@@ -1,6 +1,10 @@
 var getTopApis=function(req,res,session){
   var tenantId=session.get('tenantId');
-  print('Getting the top apis of '+tenantId);
+  //print('Getting the top apis of '+tenantId);
+   return{
+       "1":"test-api-1",
+       "2":"text-api-2"
+   }
 };
 
 var getApi=function(req){
