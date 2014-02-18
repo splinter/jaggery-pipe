@@ -10,7 +10,6 @@ var LayerStack = {};
 
 var module = (function () {
 
-    //var map = {};
     var log = new Log('route-map');
     var PARAM_DEFAULT_ROUTE = '';
     var PARAM_REF = '/';
@@ -32,7 +31,6 @@ var module = (function () {
         this.layers = this.layers.slice(0, this.layers.length - 1);
         return element;
     };
-
 
 
     function Routes(options) {
