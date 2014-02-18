@@ -59,7 +59,15 @@ var module = (function () {
             }
             else{
 
+                //If there is no default implementation then stop
                 if(!def){
+
+                    //Check if popping a layer back will give us a default implementation
+
+                    //If the previous layer has a default then take that route
+
+                    //If not then stop
+
                     return def;
                 }
 
