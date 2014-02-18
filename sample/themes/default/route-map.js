@@ -14,6 +14,7 @@ var module = (function () {
     var log = new Log('route-map');
     var PARAM_DEFAULT_ROUTE = '';
     var PARAM_REF = '/';
+    var DEF_INHERIT_VAL=false; //Dictates whether routes can inherit routes from parents
 
     function Stack() {
         this.layers = [];
@@ -33,8 +34,14 @@ var module = (function () {
     };
 
 
-    function Routes() {
+
+    function Routes(options) {
         this.map = {};
+        this.config={};
+        //Determine if whether inheritance should take place
+        //- Inheritance allows a route to backtrack and look for a parent route
+        // that may contain a matching route
+        this.config.inherit=options.inherit||DEF_INHERIT_VAL;
     }
 
     Routes.prototype.add = function (route, ref) {
@@ -45,7 +52,7 @@ var module = (function () {
         var components = route.split('/');
         var params = {};
         components = cleanseComponents(components);
-        var result = traverse(this.map, components, 0, params,new Stack());
+        var result = traverse(this.map, components, 0, params,new Stack(),this.config);
         log.info(this.map);
         return {params: params, ref: result};
     };
@@ -56,7 +63,7 @@ var module = (function () {
         buildMap(this.map, components, 0, ref);
     };
 
-    var traverse = function (mapObj, components, index, params,stack) {
+    var traverse = function (mapObj, components, index, params,stack,config) {
         if (components.length <= index) {
             var ref = getRef(mapObj);
             return ref;
@@ -71,38 +78,38 @@ var module = (function () {
                 //Save the corresponding value
                 params[getDefaultRouteName(mapObj)] = comp;
 
-                //Save the default route location
+                //Save the default route location in order to allow back tracking
                 stack.push({parent:def,ptr:index});
             }
 
+            //Determine if there is a specific match for the currrent component
             if (mapObj.hasOwnProperty(comp)) {
 
-                return traverse(mapObj[comp], components, index, params,stack);
+                return traverse(mapObj[comp], components, index, params,stack,config);
             }
             else {
 
                 //If there is no default implementation then stop
                 if (!def) {
-                    log.info('No default route');
 
                     //Check if popping a layer back will give us a default implementation
+                    //We currently only support one layer of backtracking
                     var parentLayer=stack.pop();
 
                     //If the previous layer has a default then take that route
-                    if(parentLayer){
-
-                        log.info('Backtracking'+stringify(parentLayer));
-                        log.info('index before: '+index);
+                    //Do not perform back tracking if INHERITANCE is disabled
+                    if((parentLayer)&&(config.inherit)){
+                        //Rewind the layer
                         index=parentLayer.ptr;
-                        log.info('index after rewinding: '+index);
-                        return traverse(parentLayer.parent,components,index,params,stack);
+
+                        return traverse(parentLayer.parent,components,index,params,stack,config);
                     }
 
                     //If not then stop
                     return def;
                 }
 
-                return traverse(def, components, index, params,stack);
+                return traverse(def, components, index, params,stack,config);
             }
         }
     };

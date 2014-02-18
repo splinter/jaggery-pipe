@@ -21,6 +21,8 @@ pipe.pipes.plug(errHandler);
 
 errHandler.environment = 'dev';
 
+router.app.config({inheritRoutes:true});
+
 router.app.del('/:context/user', user.logoutUser);
 
 //Setup some simple routes

@@ -25,6 +25,7 @@ var exec = (function () {
     var POST_METHOD = 'POST';
     var PUT_METHOD = 'PUT';
     var DELETE_METHOD = 'DELETE';
+    var INHERIT_ROUTES=false;
     var log = new Log();
 
 
@@ -60,6 +61,10 @@ var exec = (function () {
         return {data:data};
     };
 
+    app.config=function(options){
+        INHERIT_ROUTES=options.inheritRoutes||false;
+    }
+
     /**
      * The method is used to register a route
      * @param method The HTTP method used for the route
@@ -70,7 +75,7 @@ var exec = (function () {
         //Check if the routes contain a reference to the method type,
         //if not create a new RouteMap
         if(!routes.hasOwnProperty(method)){
-            routes[method]=new RouteMap();
+            routes[method]=new RouteMap({inherit:INHERIT_ROUTES});
         }
 
         //Determine if the user has passed in a single route or an array
