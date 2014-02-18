@@ -10,6 +10,10 @@ var getAsset=function(req,res,session){
     print('Returning asset details for asset ID: '+assetId);
 };
 
+var getAssetSample=function(req,res,session){
+    print('Getting the sample for '+req._params.type);
+};
+
 var putAsset=function(){
     print('Update asset details for any asset');
 };

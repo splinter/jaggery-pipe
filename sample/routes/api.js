@@ -7,6 +7,10 @@ var getApi=function(req){
   print('Getting api details '+req._params.id);
 };
 
+var getApiOffers=function(req){
+   print('Getting api offers');
+}
+
 var putApi=function(){
   print('Updating api details');
 };

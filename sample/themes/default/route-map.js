@@ -6,96 +6,127 @@
  * Created Date: 17/2/2014
  */
 var RouteMap = {};
+var LayerStack = {};
 
 var module = (function () {
 
     //var map = {};
     var log = new Log('route-map');
-    var PARAM_DEFAULT_ROUTE='';
-    var PARAM_REF='/';
+    var PARAM_DEFAULT_ROUTE = '';
+    var PARAM_REF = '/';
 
-    function Routes(){
-      this.map={};
+    function Stack() {
+        this.layers = [];
     }
 
-    Routes.prototype.add = function (route,ref) {
-        this.splitToComponents(route,ref);
+    Stack.prototype.push = function (element) {
+        this.layers.push(element);
     };
 
-    Routes.prototype.match=function(route){
-        var components=route.split('/');
-        var params={};
-        components=cleanseComponents(components);
-        var result=traverse(this.map,components,0,params);
-        log.info(params);
-        return {params: params, ref:result};
+    Stack.prototype.pop = function () {
+        if(this.layers.length==0){
+            return null;
+        }
+        var element = this.layers[this.layers.length-1];
+        this.layers = this.layers.slice(0, this.layers.length - 1);
+        return element;
     };
 
-    Routes.prototype.splitToComponents = function (route,ref) {
+
+    function Routes() {
+        this.map = {};
+    }
+
+    Routes.prototype.add = function (route, ref) {
+        this.splitToComponents(route, ref);
+    };
+
+    Routes.prototype.match = function (route) {
+        var components = route.split('/');
+        var params = {};
+        components = cleanseComponents(components);
+        var result = traverse(this.map, components, 0, params,new Stack());
+        log.info(this.map);
+        return {params: params, ref: result};
+    };
+
+    Routes.prototype.splitToComponents = function (route, ref) {
         var components = route.split('/');
         components = cleanseComponents(components);
-        buildMap(this.map, components, 0,ref);
+        buildMap(this.map, components, 0, ref);
     };
 
-    var traverse=function(mapObj,components,index,params){
-        if(components.length<=index){
-            var ref= getRef(mapObj);
+    var traverse = function (mapObj, components, index, params,stack) {
+        if (components.length <= index) {
+            var ref = getRef(mapObj);
             return ref;
         }
-        else{
-            var comp=components[index];
+        else {
+            var comp = components[index];
             index++;
-            var def=getDefaultRoute(mapObj);
+            var def = getDefaultRoute(mapObj);
 
             //Save the parameter values only if a default route existed
-            if(def){
+            if (def) {
                 //Save the corresponding value
-                params[getDefaultRouteName(mapObj)]=comp;
+                params[getDefaultRouteName(mapObj)] = comp;
+
+                //Save the default route location
+                stack.push({parent:def,ptr:index});
             }
 
-            if(mapObj.hasOwnProperty(comp)){
+            if (mapObj.hasOwnProperty(comp)) {
 
-                return traverse(mapObj[comp],components,index,params);
+                return traverse(mapObj[comp], components, index, params,stack);
             }
-            else{
+            else {
 
                 //If there is no default implementation then stop
-                if(!def){
+                if (!def) {
+                    log.info('No default route');
 
                     //Check if popping a layer back will give us a default implementation
+                    var parentLayer=stack.pop();
 
                     //If the previous layer has a default then take that route
+                    if(parentLayer){
+
+                        log.info('Backtracking'+stringify(parentLayer));
+                        log.info('index before: '+index);
+                        index=parentLayer.ptr;
+                        log.info('index after rewinding: '+index);
+                        return traverse(parentLayer.parent,components,index,params,stack);
+                    }
 
                     //If not then stop
-
                     return def;
                 }
 
-                return traverse(def,components,index,params);
+                return traverse(def, components, index, params,stack);
             }
         }
     };
 
-    var buildMap = function (mapObj, components, index,ref) {
+    var buildMap = function (mapObj, components, index, ref) {
         //Stop building the map if there are no more components to place
         if (components.length <= index) {
-            mapObj[PARAM_REF]=ref;
+            mapObj[PARAM_REF] = ref;
             return;
         }
         else {
             var comp = components[index];
-            var cleansed=comp;//removeTokens(comp);
+            var cleansed = comp;//removeTokens(comp);
 
             index++;
 
             //If a route does not exist then make one
             if (!mapObj.hasOwnProperty(cleansed)) {
                 mapObj[cleansed] = {};
-                if(isToken(comp)){
-                    mapObj[PARAM_DEFAULT_ROUTE]=cleansed;
+                if (isToken(comp)) {
+                    mapObj[PARAM_DEFAULT_ROUTE] = cleansed;
                 }
             }
-            buildMap(mapObj[cleansed], components, index,ref);
+            buildMap(mapObj[cleansed], components, index, ref);
 
         }
     };
@@ -121,11 +152,11 @@ var module = (function () {
         return cleansed;
     };
 
-    var isToken=function(component){
+    var isToken = function (component) {
         var tokens = ['{', ':'];
 
-        for(var index in tokens){
-            if(component.indexOf(tokens[index])>=0){
+        for (var index in tokens) {
+            if (component.indexOf(tokens[index]) >= 0) {
                 return true;
             }
         }
@@ -147,21 +178,21 @@ var module = (function () {
      * @param obj The current level
      * @returns The default route for that level if one is found,else null
      */
-    var getDefaultRoute=function(obj){
+    var getDefaultRoute = function (obj) {
         var def;
 
-        if(obj.hasOwnProperty(PARAM_DEFAULT_ROUTE)){
-             def=obj[PARAM_DEFAULT_ROUTE];
+        if (obj.hasOwnProperty(PARAM_DEFAULT_ROUTE)) {
+            def = obj[PARAM_DEFAULT_ROUTE];
             return obj[def];
         }
         return null;
     };
 
-    var getDefaultRouteName=function(obj){
+    var getDefaultRouteName = function (obj) {
         var def;
 
-        if(obj.hasOwnProperty(PARAM_DEFAULT_ROUTE)){
-              return removeTokens(obj[PARAM_DEFAULT_ROUTE]);
+        if (obj.hasOwnProperty(PARAM_DEFAULT_ROUTE)) {
+            return removeTokens(obj[PARAM_DEFAULT_ROUTE]);
         }
 
         return '';
@@ -173,14 +204,15 @@ var module = (function () {
      * @param obj An object representing the final level of the route
      * @returns If a reference is found then it is returned (an object or function),else null
      */
-    var getRef=function(obj){
-       if(obj.hasOwnProperty(PARAM_REF)){
-           return obj[PARAM_REF];
-       }
+    var getRef = function (obj) {
+        if (obj.hasOwnProperty(PARAM_REF)) {
+            return obj[PARAM_REF];
+        }
         return null;
     }
 
-    RouteMap=Routes;
+    RouteMap = Routes;
+    LayerStack = Stack;
     //RouteMap.map = map;
     //RouteMap.add = add;
     //RouteMap.match=match;

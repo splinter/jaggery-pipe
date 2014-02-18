@@ -27,13 +27,15 @@ router.app.del('/:context/user', user.logoutUser);
 router.app.get(['/:context/t/:tenant/asset/:type/top', '/:context/asset/:type/top'], asset.getTopAssets);
 router.app.get(['/:context/t/:tenant/asset/:type/:id', '/:context/asset/:type/:id'], asset.getAsset);
 
+
+router.app.get('/:context/asset/:type/sample',asset.getAssetSample);
 //The documents are publicly available to anyone,so no basic auth
 router.app.get('/:context/document/:type/:id', document.getDocument);
 
 
 //Override the top assets routes for just the APIs into a custom router
 router.app.get('/:context/asset/api/top', api.getTopApis);
-//router.app.get('/:context/asset/api/:id',api.getApi);
+router.app.get('/:context/asset/api/offers',api.getApiOffers);
 
 
 
@@ -51,6 +53,17 @@ router.app.get('/:context/asset/api/top', api.getTopApis);
 
 
 pipe.pipes.handle(request,response,session);
+//var LayerStack=require('/themes/default/route-map.js').LayerStack;
+//var l=new LayerStack();
+
+
+//l.push(1);
+//l.push(2);
+
+//log.info(l.layers);
+//log.info(l.pop());
+//log.info(l.pop());
+//log.info(l.pop());
 //var RouteMap = require('/themes/default/route-map.js').RouteMap;
 //var rm=new RouteMap();
 
