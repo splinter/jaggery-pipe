@@ -24,11 +24,8 @@ var handle = function (req, res, session, handlers) {
         handlers({code: result.error,msg:result.msg});
     }
 
-    //log.info('About to start rendering..');
-    //var cRenderer=require('/extensions/universal/caramelRenderer.js');
-    //cRenderer.render(result.data);
-
-    var renderer=app.utils('renderer')||defaultRenderer;
+    var methodType=req.getMethod().toLocaleLowerCase();
+    var renderer=app.utils(methodType+'-renderer')||defaultRenderer;
     renderer(result.data,req,res,session);
     handlers();
 };

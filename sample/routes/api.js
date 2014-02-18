@@ -1,6 +1,4 @@
 var getTopApis=function(req,res,session){
-  var tenantId=session.get('tenantId');
-  //print('Getting the top apis of '+tenantId);
    return{
        "1":"test-api-1",
        "2":"text-api-2"
@@ -8,21 +6,35 @@ var getTopApis=function(req,res,session){
 };
 
 var getApi=function(req){
-  print('Getting api details '+req._params.id);
+   return{
+       id:req._params.id,
+       name:'This is a test api'
+   }
 };
 
 var getApiOffers=function(req){
-   print('Getting api offers');
+    var offers=[];
+    offers.push({id:'1', 'msg':'Buy one and get two free!'});
+    return offers;
 }
 
 var putApi=function(){
-  print('Updating api details');
+    return{
+        code:200,
+        msg:'Api Updated successfully'
+    }
 };
 
 var deleteApi=function(){
-  print('Deleting api details');
+    return{
+        code:200,
+        msg:'Api deleted successfully!'
+    }
 };
 
 var postApi=function(){
-  print('Creating api details');
+    return{
+        code:200,
+        msg:'Created api'
+    }
 };

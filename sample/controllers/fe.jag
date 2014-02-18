@@ -22,8 +22,11 @@ pipe.pipes.plug(errHandler);
 errHandler.environment = 'dev';
 
 router.app.config({inheritRoutes:true});
+//router.app.utils('get-renderer',caramelRenderer.render);
 
 router.app.del('/:context/user', user.logoutUser);
+router.app.put('/:context/asset/:type/:id',asset.putAsset);
+router.app.put('/:context/asset/api/:id',api.putApi);
 
 //Setup some simple routes
 router.app.get(['/:context/t/:tenant/asset/:type/top', '/:context/asset/:type/top'], asset.getTopAssets);
