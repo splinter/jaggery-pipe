@@ -68,6 +68,10 @@ var exec = (function (RouteMap) {
         //Determine the method type
         var method=req.getMethod();
 
+        if((!routes[method])||(!routes[method].map)){
+            return { error: 404 , msg:'No routes for the method type', data:{}};
+        }
+
         log.info(routes[method].map);
         var match=routes[method].match(req.getRequestURI());
 
