@@ -7,7 +7,7 @@ var getTopApis=function(req,res,session){
     res._render(data);
 };
 
-var getApi=function(req){
+var getApi=function(req,res){
    var data={
        id:req._params.id,
        name:'This is a test api'
@@ -15,13 +15,13 @@ var getApi=function(req){
     res._render(data);
 };
 
-var getApiOffers=function(req){
+var getApiOffers=function(req,res){
     var offers=[];
     offers.push({id:'1', 'msg':'Buy one and get two free!'});
     res._render(offers);
 }
 
-var putApi=function(){
+var putApi=function(req,res){
     var data={
         code:200,
         msg:'Api Updated successfully'
@@ -29,7 +29,7 @@ var putApi=function(){
     res._render(data);
 };
 
-var deleteApi=function(){
+var deleteApi=function(req,res){
     var data={
         code:200,
         msg:'Api deleted successfully!'
@@ -37,7 +37,7 @@ var deleteApi=function(){
     res._render(data);
 };
 
-var postApi=function(){
+var postApi=function(req,res){
     var data={
         code:200,
         msg:'Created api'

@@ -26,7 +26,7 @@ var getAssetSample = function (req, res, session) {
    res._render(data);
 };
 
-var putAsset = function () {
+var putAsset = function (req,res) {
     var data={
         code:200,
         msg:'Asset updated successfully'
@@ -34,7 +34,7 @@ var putAsset = function () {
     res._render(data);
 };
 
-var deleteAsset = function () {
+var deleteAsset = function (req,res) {
     var data={
         code:200,
         msg:'Asset deleted successfully'
@@ -43,7 +43,7 @@ var deleteAsset = function () {
     res._render(data);
 };
 
-var postAsset = function () {
+var postAsset = function (req,res) {
     var data={
         id:1,
         name:'new api'

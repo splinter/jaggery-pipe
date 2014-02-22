@@ -15,12 +15,12 @@ var errHandler = require('/extensions/universal/simpleErrorHandler.js')
 //pipe.pipes.init(require('/profiles/default.js'));
 
 
-pipe.pipes.plug(common.tenantParser);
-pipe.pipes.plug(common.bodyParser);
-pipe.pipes.plug(common.queryParser);
+pipe.plug(common.tenantParser);
+pipe.plug(common.bodyParser);
+pipe.plug(common.queryParser);
 //pipe.pipes.plug('/asset/',basicAuth);   //Apply basic auth to routes starting with /asset/
-pipe.pipes.plug(router);
-pipe.pipes.plug(errHandler);
+pipe.plug(router);
+pipe.plug(errHandler);
 
 
 
@@ -64,7 +64,7 @@ router.app.get('/asset/api/:id',api.getApi);
 // router.app.get('/{context}/topassets',asset.overridenSuperTenantAsset);
 
 
-pipe.pipes.handle(request,response,session);
+pipe.resolve(request,response,session);
 
 
 //var LayerStack=require('/themes/default/route-map.js').LayerStack;

@@ -10,7 +10,12 @@ Description: The following script implements a simple middleware stack similar t
              3. A tenant parser which parses the url to identify tenantId (assuming the tenant url is {context}/t/{tid}
                 (simpleTenantParser)
  */
-var pipes = {};
+//var pipes = {};
+var plug;
+var initialize;
+var resolve;
+var list;
+var o;
 
 (function () {
 
@@ -223,9 +228,16 @@ var pipes = {};
         }
     }
 
-    pipes.handle = handle;
-    pipes.plug = install;
-    pipes.override = override;
-    pipes.listAllHandlers = debugListAllHandlers;
-    pipes.init=init;
+    //pipes.handle = handle;
+    //pipes.plug = install;
+    //pipes.override = override;
+    //pipes.listAllHandlers = debugListAllHandlers;
+    //pipes.init=init;
+
+      resolve=handle;
+      plug=install;
+      o=override;
+      list=debugListAllHandlers;
+      initialize=init;
+
 }());
