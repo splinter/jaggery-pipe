@@ -1,6 +1,8 @@
 getDocument=function(req,res,session){
-   return{
+   var data={
        type:req._param.type,
        id:req._param.id
-   }
+   };
+
+   res._render(data);
 };

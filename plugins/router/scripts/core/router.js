@@ -3,30 +3,32 @@ var name = 'simpleRouter';
 var app = {};
 
 /**
- * The default renderer will print the data object
+ * The default renderer will print the output as a JSON object
  * @param data
  * @param req
  * @param res
  * @param session
  */
 var defaultRenderer=function(data,req,res,session){
-    res.addHeader('Content-Type','application/json');
+    this.addHeader('Content-Type','application/json');
     print(stringify(data));
 };
 
 var handle = function (req, res, session, handlers) {
     var log = new Log();
-    log.info('Executing the simple-routing logic');
+    var methodType=req.getMethod().toLocaleLowerCase();
+    var renderer=app.utils(methodType+'-renderer')||defaultRenderer;
+    res._render=renderer;
 
     var result= app.route(req, res, session);
+
     if (result.hasOwnProperty('error')) {
         log.info('Route not handled');
         handlers({code: result.error,msg:result.msg});
     }
 
-    var methodType=req.getMethod().toLocaleLowerCase();
-    var renderer=app.utils(methodType+'-renderer')||defaultRenderer;
-    renderer(result.data,req,res,session);
+
+    //renderer(result.data,req,res,session);
     handlers();
 };
 
@@ -74,8 +76,8 @@ var exec = (function (RouteMap) {
         }
 
         req._params=match.params;
-        var data=match.ref(req,res,session)||{};
-        return {data:data};
+        match.ref(req,res,session)||{};
+        return {};
     };
 
     app.config=function(options){
@@ -101,6 +103,8 @@ var exec = (function (RouteMap) {
      * @param handler The logic to be executed
      */
     var register=function(method,route,handler){
+        //Add the context since the user will only enter resource path
+
         //Check if the routes contain a reference to the method type,
         //if not create a new RouteMap
         if(!routes.hasOwnProperty(method)){
@@ -110,12 +114,31 @@ var exec = (function (RouteMap) {
         //Determine if the user has passed in a single route or an array
         if(route instanceof  Array){
             for(var index in route){
-                routes[method].add(route[index],handler);
+                //routes[method].add(route[index],handler);
+                addRoute(route[index],handler,routes[method]);
             }
         }
         else{
-            routes[method].add(route,handler);
+            //routes[method].add(route,handler);
+            addRoute(route,handler,routes[method]);
         }
     };
+
+    /**
+     * The function appends the route
+     * @param route
+     * @returns {string}
+     */
+    var addContext=function(route){
+        route='/:context'+route;
+        return route;
+    }
+
+    var addRoute=function(route,handler,routes){
+
+        log.info('Adding: '+route);
+        route=addContext(route);
+        routes.add(route,handler);
+    }
 
 }(RouteMap));

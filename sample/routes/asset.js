@@ -6,39 +6,48 @@ var getTopAssets = function (req, res, session) {
     topAssets.push({id: 1, name: type + '-1'});
     topAssets.push({id: 2, name: type + '-2'});
 
-    return topAssets;
+    res._render(topAssets);
 };
 
 var getAsset = function (req, res, session) {
-    return{
+    var data={
         id: req._params.id,
         name: 'test-' + req._params.type
     };
+    //print('Overriden');
+    res._render(data);
 };
 
 var getAssetSample = function (req, res, session) {
-   return{
+   var data={
        msg:'This is a sample!'
-   }
+   };
+
+   res._render(data);
 };
 
 var putAsset = function () {
-    return{
+    var data={
         code:200,
         msg:'Asset updated successfully'
-    }
+    };
+    res._render(data);
 };
 
 var deleteAsset = function () {
-    return{
+    var data={
         code:200,
         msg:'Asset deleted successfully'
-    }
+    };
+
+    res._render(data);
 };
 
 var postAsset = function () {
-    return{
+    var data={
         id:1,
         name:'new api'
-    }
+    };
+
+    res._render(data);
 };
