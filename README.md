@@ -32,6 +32,8 @@ Router
 ------
 The router plug-in allows routes to be defined in a simple and clean manner.
 
+### Basic Usage
+
 fe.jag:
 ```javascript
    var router=require('router');
@@ -69,6 +71,33 @@ fe.jag:
 ```
 
 Much more readable,right? :)
+
+### Using a renderer
+
+In addition to using the print statement,the router plug-in can use a renderer to respond to a request. The router plug-in comes with a sample renderer which will send a json response.
+ 
+```javascript
+  var sayHelloInJSON=function(req,res){
+     var data={
+       msg: 'Hello, I am a json object'
+     };
+     
+     res._render(data);
+  }
+```
+You can also set your own renderer per request method type;
+
+```javascript
+  router.app.utils('get-renderer',function(data){
+      print('This is a custom renderer : '+stringify(data));
+  });
+```
+
+Similarly you can also set renderers for other methods by using:
+* put-renderer
+* delete-renderer
+* post-renderer
+
 
 
 Writing a plug-in
