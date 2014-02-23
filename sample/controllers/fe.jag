@@ -10,25 +10,26 @@ var api = require('/routes/api.js');
 var user = require('/routes/user.js');
 var document = require('/routes/document.js');
 //var queryParser=require('/extensions/universal/query-parser.js').queryParser;
-var basicAuth = require('/extensions/universal/basicAuth.js');
-var errHandler = require('/extensions/universal/simpleErrorHandler.js');
+//var basicAuth = require('/extensions/universal/basicAuth.js');
+//var errHandler = require('/extensions/universal/simpleErrorHandler.js');
 var myPlugin=require('/extensions/pipe-plugins/my-plugin.js');
 var myErrPlugin=require('/extensions/pipe-plugins/my-err-plugin.js');
 //pipe.pipes.init(require('/profiles/default.js'));
-
-
+//common.errHandler.env('production');
+pipe.plug(common.basicAuth);
+pipe.plug(common.logger);
 pipe.plug(common.tenantParser);
 pipe.plug(common.bodyParser);
 pipe.plug(common.queryParser);
-pipe.plug(myPlugin);
+//pipe.plug(myPlugin);
 //pipe.pipes.plug('/asset/',basicAuth);   //Apply basic auth to routes starting with /asset/
 pipe.plug(router);
-pipe.plug(errHandler);
-pipe.plug(myErrPlugin);
+pipe.plug(common.errHandler);
+//pipe.plug(myErrPlugin);
 
+log.info('env: '+common.errHandler.env());
 
-
-errHandler.environment = 'dev';
+//errHandler.environment = 'dev';
 
 //router.app.config({inheritRoutes:true});
 //router.app.utils('get-renderer',caramelRenderer.render);
