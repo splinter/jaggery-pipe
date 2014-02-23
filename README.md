@@ -115,11 +115,37 @@ Similarly you can also set renderers for other methods by using:
 * post-renderer
 
 
-
 Writing a plug-in
 =================
 Writing a new plug-in is easy as defining a simple function callback.The Jaggery-Pipe requires a method named handle which is used to access the functionality of your plug-in as a request is serviced.
 
+There are two types of plug-ins that can be used with the Pipe;
+1. Functional plug-in
+2. Error Handler plug-in
 
+A functional plug-in can be created by defining a handle function with a specific sugnature as shown below;
+
+**my-plugin.js**:
+
+```javascript
+var handle=function(req,res,session,handlers){
+    var log=new Log();
+    log.info('my pipe plugin, does nothing!');
+    handlers();
+};
+```
+Although, it is perfectly fine to omit calling the handlers method, it is polite to invoke it so that the request can transition to the rest of plug-ins in the chain.
+
+A plugin for handling errors can be created in a similar manner to a functional plug-in with one difference.The handle method signature accepts an error object which is passed down from the rest of the plugins in the pipe.An error plugin is only activated if a functional plugin immediately above it in the plug-in chain invokes the handlers function with an object.
+
+**my-err-plugin.js**:
+
+```javascript
+var handle=function(err,req,res,session,handlers){
+   var log=new Log();
+   log.info('my pipe plugin to catch errors!');
+    handlers(err);
+};
+```
 
 
