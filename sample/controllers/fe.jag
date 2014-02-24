@@ -9,34 +9,25 @@ var asset = require('/routes/asset.js');
 var api = require('/routes/api.js');
 var user = require('/routes/user.js');
 var document = require('/routes/document.js');
-//var queryParser=require('/extensions/universal/query-parser.js').queryParser;
-//var basicAuth = require('/extensions/universal/basicAuth.js');
-//var errHandler = require('/extensions/universal/simpleErrorHandler.js');
+
 var myPlugin=require('/extensions/pipe-plugins/my-plugin.js');
 var myErrPlugin=require('/extensions/pipe-plugins/my-err-plugin.js');
 //pipe.pipes.init(require('/profiles/default.js'));
 //common.errHandler.env('production');
-pipe.plug(common.basicAuth);
-pipe.plug(common.logger);
+//pipe.plug(common.basicAuth);
+//pipe.plug(common.logger);
 pipe.plug(common.tenantParser);
 pipe.plug(common.bodyParser);
 pipe.plug(common.queryParser);
-//pipe.plug(myPlugin);
-//pipe.pipes.plug('/asset/',basicAuth);   //Apply basic auth to routes starting with /asset/
+
 pipe.plug(router);
 pipe.plug(common.errHandler);
-//pipe.plug(myErrPlugin);
+
 
 log.info('env: '+common.errHandler.env());
 
-common.basicAuth.override('isLoggedIn',function(session,credentials){
-        log.info('Calling isLoggedIn');
-        return false;
-});
-//errHandler.environment = 'dev';
-
 //router.app.config({inheritRoutes:true});
-//router.app.utils('get-renderer',caramelRenderer.render);
+router.app.utils('get-renderer',caramelRenderer.render);
 
 router.app.del('/user', user.logoutUser);
 router.app.post('/asset/:type',asset.postAsset);
@@ -53,54 +44,9 @@ router.app.get('/asset/:type/sample',asset.getAssetSample);
 //The documents are publicly available to anyone,so no basic auth
 router.app.get('/document/:type/:id', document.getDocument);
 
-
-//Override the top assets routes for just the APIs into a custom router
-//router.app.get('/asset/api/top', api.getTopApis);
-//router.app.get('/asset/api/offers',api.getApiOffers);
 router.app.get('/asset/api/:id',api.getApi);
-
-
-
-
-//router.app.get(['/{context}/asset/{type}/{id}','/{context}/asset/t/{tenant}/asset/{type}/{id}'],asset.getAsset);
-//router.app.put(['/{context}/asset/{type}/{id}','/{context}/asset/t/{tenant}/asset/{type}/{id}'],asset.updateAsset);
-//router.app.delete(['/{context}/asset/{type}/{id}','/{context}/asset/t/{tenant}/asset/{type}/{id}'],asset.deleteAsset);
-//router.app.post(['/{context}/asset/{type}/{id}','/{context}/asset/t/{tenant}/asset/{type}/{id}'],asset.createAsset);
-
-//router.app.get('/{context}/topassets/{type}',asset.topSuperTenantAsset);
-//router.app.get('/{context}/t/{tenant}/topassets/{type}',asset.topTenantAsset);
-
-//router.app.overrideGet('/{context}/topassets/{type}','/{context}/topassets/api',api.apiTopAssets);
-
-// router.app.get('/{context}/topassets',asset.overridenSuperTenantAsset);
-
 
 pipe.resolve(request,response,session);
 
-
-//var LayerStack=require('/themes/default/route-map.js').LayerStack;
-//var l=new LayerStack();
-
-
-//l.push(1);
-//l.push(2);
-
-//log.info(l.layers);
-//log.info(l.pop());
-//log.info(l.pop());
-//log.info(l.pop());
-//var RouteMap = require('jaggery-router').RouteMap;
-//var rm=new RouteMap();
-
-//rm.add('/:context/asset/:type/:id','1');
-//rm.add('/:context/asset/api/:id','2');
-//var match=rm.match(request.getRequestURI());
-
-//log.info(rm.map);
-//log.info(match);
-
-
-// var caramel=require('caramel');
-// caramel.render({});
 
 %>

@@ -26,7 +26,7 @@ var putApi=function(req,res){
         code:200,
         msg:'Api Updated successfully'
     };
-    res._render(data);
+    res._render('api', data);
 };
 
 var deleteApi=function(req,res){

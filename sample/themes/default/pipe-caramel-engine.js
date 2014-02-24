@@ -20,9 +20,17 @@ var engine = (function () {
 
     };
 
+    /**
+     * The function registers all helpers in the provided directory
+     * @param dir The name of the directory containing the helper functions
+     */
+    var loadHandlebarsHelpers=function(dir){
+
+    };
+
     var render = function (data, meta) {
         log.info('Render method called');
-        var RouteMap=require('jaggery-router').RouteMap;
+        var RouteMap=require('router').RouteMap;
         var rm=new RouteMap();
         readMappingFile('',rm);
 

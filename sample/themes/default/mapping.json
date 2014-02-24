@@ -4,3 +4,4 @@
     "/:context/asset/:type/top" :"/themes/default/renderers/topassets.js",
     "/:context/t/:tenant/asset/:type/top":"/themes/default/renderers/topassets.js"
 }
+
