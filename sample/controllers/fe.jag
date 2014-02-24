@@ -32,7 +32,8 @@ router.app.utils('get-renderer',caramelRenderer.render);
 router.app.del('/user', user.logoutUser);
 router.app.post('/asset/:type',asset.postAsset);
 router.app.put('/asset/:type/:id',asset.putAsset);
-router.app.put('/asset/api/:id',api.putApi);
+router.app.get('/asset/api/top',api.getTopApis);
+//router.app.put('/asset/api/:id',api.putApi);
 router.app.get('/user/logout',user.logoutUser);
 
 //Setup some simple routes

@@ -24,21 +24,40 @@ var engine = (function () {
      * The function registers all helpers in the provided directory
      * @param dir The name of the directory containing the helper functions
      */
-    var loadHandlebarsHelpers=function(dir){
+    var loadHandlebarsHelpers = function (dir) {
 
     };
 
     var render = function (data, meta) {
         log.info('Render method called');
-        var RouteMap=require('router').RouteMap;
-        var rm=new RouteMap();
-        readMappingFile('',rm);
 
-        var req=meta.request;
-        var uri=req.getRequestURI();
-        var route=rm.match(uri);
 
-        var renderer=require(route.ref).render(theme);
+        var req = meta.request;
+        var dir='/themes/default/renderers';
+        var viewId = data.__viewId || '';
+
+        //There is no viewId
+        if (viewId == '') {
+            //Render an error page
+            print('Error ! Error ! No viewId has been specified');
+            return;
+        }
+        var path= dir+'/'+viewId+'.js';
+        var file=new File(path);
+
+        if(file.isExists()){
+            var renderer=require(path);
+
+            //Check if a render method exists
+            if(renderer['render']){
+                renderer.render(data);
+                return;
+            }
+
+        }
+
+        print('Error! Error! The view could not be found or there is no render method');
+        //var renderer=require().render(theme);
     };
 
     var theme = function (page, contexts, jss, css, code) {
@@ -138,11 +157,11 @@ var engine = (function () {
         print(template(contexts));
     };
 
-    var readMappingFile=function(fileName,routeMap){
-        var mapping=require('/themes/default/mapping.json');
+    var readMappingFile = function (fileName, routeMap) {
+        var mapping = require('/themes/default/mapping.json');
 
-        for(var key in mapping){
-            routeMap.add(key,mapping[key]);
+        for (var key in mapping) {
+            routeMap.add(key, mapping[key]);
         }
     };
 
