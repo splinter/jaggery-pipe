@@ -9,8 +9,21 @@ var app = {};
  * @param res
  * @param session
  */
-var defaultRenderer=function(data,req,res,session){
+var defaultRenderer=function(viewId,data,req,res,session){
     this.addHeader('Content-Type','application/json');
+    var log=new Log();
+    //Check if only data has been sent
+    if(arguments.length==1){
+
+        //Do nothing if the user has only given an id
+        if(arguments[0] instanceof String){
+            log.info('Please provide a data object to render');
+            return;
+        }
+        log.info('Only data has been provided');
+        data=arguments[0];
+    }
+
     print(stringify(data));
 };
 
@@ -80,8 +93,8 @@ var exec = (function (RouteMap) {
         }
 
         req._params=match.params;
-        match.ref(req,res,session)||{};
-        return {};
+        return match.ref(req,res,session)||{};
+        //return {};
     };
 
     app.config=function(options){

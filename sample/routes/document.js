@@ -4,5 +4,5 @@ getDocument=function(req,res,session){
        id:req._param.id
    };
 
-   res._render(data);
+   res._render('getDocument',data);
 };

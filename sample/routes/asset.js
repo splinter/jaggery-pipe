@@ -6,7 +6,7 @@ var getTopAssets = function (req, res, session) {
     topAssets.push({id: 1, name: type + '-1'});
     topAssets.push({id: 2, name: type + '-2'});
 
-    res._render(topAssets);
+    res._render('topAssets',topAssets);
 };
 
 var getAsset = function (req, res, session) {
@@ -15,7 +15,7 @@ var getAsset = function (req, res, session) {
         name: 'test-' + req._params.type
     };
     //print('Overriden');
-    res._render(data);
+    res._render('getAsset',data);
 };
 
 var getAssetSample = function (req, res, session) {
@@ -23,7 +23,7 @@ var getAssetSample = function (req, res, session) {
        msg:'This is a sample!'
    };
 
-   res._render(data);
+   res._render('getAssetSample',data);
 };
 
 var putAsset = function (req,res) {
