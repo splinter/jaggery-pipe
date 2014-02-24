@@ -29,6 +29,10 @@ pipe.plug(common.errHandler);
 
 log.info('env: '+common.errHandler.env());
 
+common.basicAuth.override('isLoggedIn',function(session,credentials){
+        log.info('Calling isLoggedIn');
+        return false;
+});
 //errHandler.environment = 'dev';
 
 //router.app.config({inheritRoutes:true});
@@ -38,6 +42,7 @@ router.app.del('/user', user.logoutUser);
 router.app.post('/asset/:type',asset.postAsset);
 router.app.put('/asset/:type/:id',asset.putAsset);
 router.app.put('/asset/api/:id',api.putApi);
+router.app.get('/user/logout',user.logoutUser);
 
 //Setup some simple routes
 router.app.get(['/t/:tenant/asset/:type/top', '/asset/:type/top'], asset.getTopAssets);
