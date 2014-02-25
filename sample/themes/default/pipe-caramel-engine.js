@@ -1,13 +1,49 @@
+/**
+ * Description: The following script implements a custom caramel engine. The impetus behind this engine is to support the
+ * new routing mechanism.In fact,you should have found this engine inside the router module (If not something has gone
+ * horribly wrong or ....right :) ).
+ *
+ * Dependencies:
+ * ------------
+ * The engine uses the Handlebars templating framework to render HTML , so make sure that the handlebars module is in the
+ * modules directory
+ *
+ * In order for this engine to work you will need to be first configured as the default enegine in theme.js and when calling the
+ * caramel render method,make sure to pass in a __viewId property (two underscores).
+ *
+ * The engine consumes a bunch of resources organized into several folders;
+ * 1. partials
+ * 2. pages
+ * 3. public: All of the css,js and images should go here
+ * 4. renderers
+ * 5. handle-bar-helpers : Put all of your handlebars helpers here
+ *
+ *
+ * Filename: pipe-caramel-engine.js
+ */
 var engine = (function () {
 
     var log = new Log('pipe-caramel-engine');
+    var Handlebars = require('handlebars').Handlebars;
+    var PARTIAL_DIR = 'partials';
+    var PAGES_DIR = 'pages';
+    var HELPER_DIR = 'handle-bar-helpers';
+    var RENDERERS_DIR = 'renderers';
+    var JS_DIR = 'public/js';
+    var CSS_DIR = 'public/css';
+    var IMAGES_DIR = 'public/images';
+    var plugins=[];
 
+    /**
+     * The function is called when the engine is initialized by the Caramel core
+     */
     var init = function () {
-        log.info('Init method called');
+        this.partials(Handlebars);
     };
 
     var partials = function () {
-        log.info('Partials method called');
+        loadHandlebarsHelpers(HELPER_DIR, Handlebars);
+        loadHandlebarsPartials(PARTIAL_DIR, Handlebars);
     };
 
     var translate = function () {
@@ -17,23 +53,99 @@ var engine = (function () {
 
     var globals = function () {
         log.info('Globals method called');
+    };
 
+    /**
+     * The function returns the name of the provided file without the extension
+     * @param file A file instance
+     */
+    var getFileName = function (file) {
+        var fullName = file.getName();
+        var components = fullName.split('.');
+        var fileName = '';
+        for (var index = 0; index < components.length - 1; index++) {
+            fileName += components[index];
+        }
+        return fileName;
+    };
+
+    /**
+     * The function returns the path of a directory relative to the themes folder
+     * @param dir
+     * @returns {*}
+     */
+    var getPath = function (dir) {
+        var path = caramel.theme().resolve(dir);
+        log.info('Path: ' + path);
+        return path;
+    };
+
+    /**
+     * The function is a helper to recursively travel a directory
+     * @param file The current file been examined
+     * @param register A function call back that will recieve the current file.It is free to do
+     * what ever it wants with the file.
+     */
+    var recursiveRegister = function (file, register) {
+        if (!file.isDirectory()) {
+            register(file);
+        }
+        else {
+            var dir = file;
+            var files = dir.listFiles();
+
+            for (var index in files) {
+                recursiveRegister(files[index], register);
+            }
+            return;
+        }
     };
 
     /**
      * The function registers all helpers in the provided directory
      * @param dir The name of the directory containing the helper functions
      */
-    var loadHandlebarsHelpers = function (dir) {
+    var loadHandlebarsHelpers = function (dir, handleBars) {
+        var base = getPath(dir);//'/themes/default/' + dir;
+        var dir = new File(base);
+        log.info('Registering helpers');
+        recursiveRegister(dir, function (file) {
 
+            var helper = base + '/' + file.getName();
+            var module = require(helper).helpers(handleBars);
+            for (var key in module) {
+                log.info('Registering helper: ' + key);
+                handleBars.registerHelper(key, module[key]);
+            }
+        });
     };
 
+    /**
+     * The function is used to load all of the partials
+     * @param dir The path to the directory containing the partials
+     */
+    var loadHandlebarsPartials = function (dir, handleBars) {
+        var base = getPath(dir);//'/themes/default/' + dir;
+        var dir = new File(base);
+        recursiveRegister(dir, function (file) {
+            file.open('r');
+            log.info('Registering partial file: ' + file.getName());
+            handleBars.registerPartial(getFileName(file), file.readAll());
+            file.close();
+        });
+    };
+
+    /**
+     * This is the entry point for all the rendering.The caramel engine will call this
+     * method internally.
+     * @param data The data to be rendered along with a unique viewId which matches one of the renderers
+     * @param meta A variable populated by the caramel engine , contains a bunch of usefull references to
+     *             the request object (Refer: caramel.core.js)
+     */
     var render = function (data, meta) {
         log.info('Render method called');
-
-
         var req = meta.request;
-        var dir='/themes/default/renderers';
+        var dir = getPath(RENDERERS_DIR);//'/themes/default/renderers';
         var viewId = data.__viewId || '';
 
         //There is no viewId
@@ -42,127 +154,77 @@ var engine = (function () {
             print('Error ! Error ! No viewId has been specified');
             return;
         }
-        var path= dir+'/'+viewId+'.js';
-        var file=new File(path);
+        var path = dir + '/' + viewId + '.js';
+        var file = new File(path);
 
-        if(file.isExists()){
-            var renderer=require(path);
+        if (file.isExists()) {
+            var renderer = require(path);
 
             //Check if a render method exists
-            if(renderer['render']){
-                renderer.render(data);
+            if (renderer['render']) {
+                renderer.render(theme, data);
                 return;
             }
 
         }
+        else {
+            log.info('Rendering as json since the renderer could not be found or a render method was not specified.');
+            print(caramel.build(data));
+        }
 
-        print('Error! Error! The view could not be found or there is no render method');
-        //var renderer=require().render(theme);
     };
 
+    /**
+     * The function is used to obtain the page path given the name
+     * @param pageName
+     */
+    var getPagePath = function (pageName) {
+        var pagePath = PAGES_DIR + pageName + '.hbs';
+        return   getPath(pagePath);
+    };
+
+    /**
+     * The function returns the contents of a given page
+     * @param pagePath
+     * @returns {string}
+     */
+    var getPageContent = function (pagePath) {
+        var page = new File(pagePath);
+        var pageContent = '';
+
+        if(page.isExists()){
+            page.open('r');
+            pageContent=page.readAll();
+            page.close();
+        }
+        return pageContent;
+    };
+
+    /**
+     * The function is responsible for rendering the content seen by the user
+     * @param page
+     * @param contexts
+     * @param jss
+     * @param css
+     * @param code
+     */
     var theme = function (page, contexts, jss, css, code) {
-        var file, template, path, area, blocks, helper, length, i, o, areas, block,
-            areaContexts, data, areaData, find, blockData,
-            theme = caramel.theme(),
-            meta = caramel.meta(),
-            xcd = meta.request.getHeader(caramelData);
-        js = js || [];
-        css = css || [];
-        code = code || [];
+        //var pagePath = getPagePath(page);
+        //var pageContent=getPageContent(pagePath);
+        var meta=caramel.meta();
 
-        if (xcd) {
-            find = function (areaContexts, partial) {
-                var i, context,
-                    length = areaContexts.length;
-                for (i = 0; i < length; i++) {
-                    if (areaContexts[i].partial === partial) {
-                        context = areaContexts[i].context;
-                        return typeof context === 'function' ? context() : context;
-                    }
-                }
-                return null;
-            };
-            data = {
-                _: {}
-            };
-            areas = parse(xcd);
-            for (area in areas) {
-                if (areas.hasOwnProperty(area)) {
-                    areaContexts = contexts[area];
-                    if (areaContexts instanceof Array) {
-                        blocks = areas[area];
-                        areaData = (data[area] = {});
-                        length = blocks.length;
-                        for (i = 0; i < length; i++) {
-                            block = blocks[i];
-                            blockData = (areaData[block] = {
-                                resources: {}
-                            });
-                            blockData.context = find(areaContexts, block);
-                            path = theme.resolve.call(theme, helpersDir + '/' + block + '.js');
-                            if (new File(path).isExists()) {
-                                helper = require(path);
-                                if (helper.resources) {
-                                    o = helper.resources(page, meta);
-                                    blockData.resources.js = o.js;
-                                    blockData.resources.css = o.css;
-                                    blockData.resources.code = o.code ? evalCode(o.code, meta.data, theme) : null;
-                                }
-                            }
-                        }
-                    } else {
-                        data[area] = areaContexts;
-                    }
-                }
-            }
-            data._.js = js;
-            data._.css = css;
-            data._.code = code;
-            meta.response.addHeader('Content-Type', 'application/json');
-            print(data);
-            return;
-        }
+        //var compiledPage = Handlebars.compile(pageContent);
+        //print(compiledPage(contexts));
 
-        for (area in contexts) {
-            if (contexts.hasOwnProperty(area)) {
-                blocks = contexts[area];
-                if (blocks instanceof Array) {
-                    length = blocks.length;
-                    for (i = 0; i < length; i++) {
-                        path = caramel.theme().resolve(helpersDir + '/' + blocks[i].partial + '.js');
-                        if (new File(path).isExists()) {
-                            helper = require(path);
-                            if (helper.resources) {
-                                o = helper.resources(page, meta);
-                                js = o.js ? js.concat(o.js) : js;
-                                css = o.css ? css.concat(o.css) : css;
-                                code = o.code ? code.concat(o.code) : code;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        meta.js = js;
-        meta.css = css;
-        meta.code = code;
-        path = caramel.theme().resolve(pagesDir + '/' + page + '.hbs');
-        if (log.isDebugEnabled()) {
-            log.debug('Rendering page : ' + path);
-        }
-        file = new File(path);
-        file.open('r');
-        template = Handlebars.compile(file.readAll());
-        file.close();
-        print(template(contexts));
+
     };
 
-    var readMappingFile = function (fileName, routeMap) {
-        var mapping = require('/themes/default/mapping.json');
-
-        for (var key in mapping) {
-            routeMap.add(key, mapping[key]);
-        }
+    /**
+     * The function is used to install a plug-in to the engine
+     * @param plugin The plugin to be installed
+     */
+    var use=function(plugin){
+       plugins.push(plugin);
     };
 
     return{

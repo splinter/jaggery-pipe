@@ -1,4 +1,9 @@
-var render=function(data){
-    print('Getting api details');
-    print(stringify(data));
+var render=function(theme,data){
+    theme('index',{
+       body:[
+           {
+               partial:'getApi',
+               context:data
+           }]
+    });
 };

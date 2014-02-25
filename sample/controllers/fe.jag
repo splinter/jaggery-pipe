@@ -49,5 +49,7 @@ router.app.get('/asset/api/:id',api.getApi);
 
 pipe.resolve(request,response,session);
 
+//log.info(getFileName('test-api.jag'));
+
 
 %>

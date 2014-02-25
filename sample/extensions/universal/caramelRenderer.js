@@ -7,7 +7,7 @@ var render = function (viewId, data) {
         return;
     }
 
-    var caramel = require('caramel');
+    caramel = require('caramel');
     data.__viewId=viewId;
     caramel.render(data);
 };

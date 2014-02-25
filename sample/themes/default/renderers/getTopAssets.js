@@ -1,4 +1,4 @@
 var render=function(data){
-    print('Getting top asset  details');
+    print('Getting top asset details');
     print(stringify(data));
 };
