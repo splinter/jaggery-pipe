@@ -32,7 +32,7 @@ var engine = (function () {
     var JS_DIR = 'public/js';
     var CSS_DIR = 'public/css';
     var IMAGES_DIR = 'public/images';
-    var plugins=[];
+    var plugins = [];
 
     /**
      * The function is called when the engine is initialized by the Caramel core
@@ -192,9 +192,9 @@ var engine = (function () {
         var page = new File(pagePath);
         var pageContent = '';
 
-        if(page.isExists()){
+        if (page.isExists()) {
             page.open('r');
-            pageContent=page.readAll();
+            pageContent = page.readAll();
             page.close();
         }
         return pageContent;
@@ -211,20 +211,64 @@ var engine = (function () {
     var theme = function (page, contexts, jss, css, code) {
         //var pagePath = getPagePath(page);
         //var pageContent=getPageContent(pagePath);
-        var meta=caramel.meta();
+        var meta = caramel.meta();
 
         //var compiledPage = Handlebars.compile(pageContent);
         //print(compiledPage(contexts));
+        var params={
+            page:page,
+            contexts:contexts,
+            Handlebars:Handlebars
+        }
+
+        //Call the process method of all plugins
+        executePluginAction(plugins,'process',params);
+
+        //Call the output method so that an appropriate plug-in will do the rendering
+        executePluginAction(plugins,'output',params,true);
+    };
+
+    /**
+     * The function executes the request plugin action on all of the
+     * registered plugins
+     * @param plugins
+     * @param action
+     */
+    var executePluginAction = function (plugins, action, params, check) {
+
+        var plugin;
+        var page=params.page;
+        var Handlebars=params.Handlebars;
+        var contexts=params.contexts;
+        var meta = caramel.meta();
+        var check = check || false; //Call the check method of the plug-in before invoking action
 
 
+        for (var index in plugins) {
+
+            plugin = plugins[index];
+
+            var usePlugin = true; //We assume all plug-ins can be used
+
+            //Check if the plugin can be run
+            if (check) {
+                usePlugin = (plugin.check) ? plugin.check(meta.request) : false;
+
+            }
+
+            //Call the action provided the action exists and the plugin can be used
+            if ((usePlugin) && (plugin[action])) {
+                plugin[action](page, contexts, meta, Handlebars);
+            }
+        }
     };
 
     /**
      * The function is used to install a plug-in to the engine
      * @param plugin The plugin to be installed
      */
-    var use=function(plugin){
-       plugins.push(plugin);
+    var use = function (plugin) {
+        plugins.push(plugin);
     };
 
     return{

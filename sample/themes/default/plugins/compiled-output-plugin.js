@@ -1,4 +1,4 @@
-var check=function(req){
+var check=function(){
     //Check the request to see if the application/html content-type header has been set
 
     return true;

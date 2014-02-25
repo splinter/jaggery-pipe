@@ -1,7 +1,11 @@
 var cache=false;
 
+var pipeEngine= require('/themes/default/pipe-caramel-engine.js').engine;
 
-var engine=caramel.engine('pipe',require('/themes/default/pipe-caramel-engine.js').engine);
+pipeEngine.use(require('./plugins/compile-resources.js'));
+pipeEngine.use(require('./plugins/compiled-output-plugin.js'));
+
+var engine=caramel.engine('pipe',pipeEngine);//require('/themes/default/pipe-caramel-engine.js').engine);
 
 var resolve= function (path) {
     var log=new Log();
