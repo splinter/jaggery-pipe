@@ -32,6 +32,7 @@ var engine = (function () {
     var JS_DIR = 'public/js';
     var CSS_DIR = 'public/css';
     var IMAGES_DIR = 'public/images';
+    var PUBLIC_DIR='public/';
     var plugins = [];
 
     /**
@@ -54,6 +55,10 @@ var engine = (function () {
     var globals = function () {
         log.info('Globals method called');
     };
+
+    var getPublicDir=function(){
+        return PUBLIC_DIR;
+    }
 
     /**
      * The function returns the name of the provided file without the extension
@@ -109,6 +114,7 @@ var engine = (function () {
         var base = getPath(dir);//'/themes/default/' + dir;
         var dir = new File(base);
         log.info('Registering helpers');
+        handleBars._getPublicDir=getPublicDir;
         recursiveRegister(dir, function (file) {
 
             var helper = base + '/' + file.getName();
@@ -276,7 +282,8 @@ var engine = (function () {
         translate: translate,
         globals: globals,
         init: init,
-        render: render
+        render: render,
+        use:use
     };
 
 }());

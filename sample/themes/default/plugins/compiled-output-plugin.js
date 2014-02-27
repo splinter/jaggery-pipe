@@ -4,14 +4,16 @@ var check=function(){
     return true;
 };
 
+var PAGES_DIR='pages/';
 
 /**
  * The function is used to obtain the page path given the name
  * @param pageName
  */
 var getPagePath = function (pageName) {
+
     var pagePath = PAGES_DIR + pageName + '.hbs';
-    return   getPath(pagePath);
+    return caramel.theme().resolve(pagePath);
 };
 
 /**
@@ -22,7 +24,6 @@ var getPagePath = function (pageName) {
 var getPageContent = function (pagePath) {
     var page = new File(pagePath);
     var pageContent = '';
-
     if(page.isExists()){
         page.open('r');
         pageContent=page.readAll();
@@ -42,6 +43,9 @@ var getPageContent = function (pagePath) {
 var output=function(page,contexts,meta,Handlebars){
    var pagePath=getPagePath(page);
    var pageContent=getPageContent(pagePath);
+
+    log.info('Meta: ');
+    log.info(stringify(caramel.meta().js));
 
    var compiledPage=Handlebars.compile(pageContent);
    print(compiledPage(contexts));

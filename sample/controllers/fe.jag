@@ -16,6 +16,8 @@ var myErrPlugin=require('/extensions/pipe-plugins/my-err-plugin.js');
 //common.errHandler.env('production');
 //pipe.plug(common.basicAuth);
 //pipe.plug(common.logger);
+var staticContent=require('/extensions/pipe-plugins/static-content-handler.js');
+pipe.plug('/themes/default/public/',staticContent);
 pipe.plug(common.tenantParser);
 pipe.plug(common.bodyParser);
 pipe.plug(common.queryParser);

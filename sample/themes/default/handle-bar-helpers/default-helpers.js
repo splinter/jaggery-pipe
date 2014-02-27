@@ -22,6 +22,14 @@ var helpers = function (Handlebars) {
         return template(context);
     };
 
+    renderJS = function (js, inline) {
+        return '<script' + (inline ? '>' + js : ' src="' + js + '">') + '</script>';
+    };
+
+    renderCSS = function (css) {
+        return '<link rel="stylesheet" type="text/css" href="' + css + '"/>';
+    };
+
     var meta = function (theme) {
         var code, g,
             meta = caramel.meta(),
@@ -93,6 +101,8 @@ var helpers = function (Handlebars) {
     };
 
     var js = function () {
+        var log=new Log();
+        log.info('JS Helper called');
         var i, url, length,
             html = '',
             theme = caramel.theme(),
@@ -108,7 +118,9 @@ var helpers = function (Handlebars) {
         url = theme.url;
         for (i = 0; i < length; i++) {
             //remove \n when production = true
-            html += '\n' + renderJS(url.call(theme, 'js/' + js[i]));
+            //log.info(url('a'));
+            //log.info(url.call(Handlebars._getPublicDir(js[i])));
+            html += '\n' + renderJS(url.call(theme, Handlebars._getPublicDir()+'js/' + js[i]));
         }
         return new Handlebars.SafeString(html);
     };
