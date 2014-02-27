@@ -32,7 +32,8 @@ var engine = (function () {
     var JS_DIR = 'public/js';
     var CSS_DIR = 'public/css';
     var IMAGES_DIR = 'public/images';
-    var PUBLIC_DIR='public/';
+    var PUBLIC_DIR = 'public/';
+    var TRANSLATION_FILE='/shared/i18n';
     var plugins = [];
 
     /**
@@ -47,16 +48,36 @@ var engine = (function () {
         loadHandlebarsPartials(PARTIAL_DIR, Handlebars);
     };
 
+    /**
+     * The following function will check if a translation file is available for the provided
+     * language in the i18n folder.If a translation is found it used to perform the translation,else
+     * the core translate method is invoked.
+     * @returns Translated text if  a matching language file is found on the server,else the same text
+     */
     var translate = function () {
-        log.info('Translate method called');
-        //We can reuse the code from the Caramel Handlebars engine
+        var language, dir, path,
+            config = caramel.configs(),
+            code = config.language ? config.language() : 'en';
+        language = languages[code];
+        if (!language) {
+            dir = TRANSLATION_FILE;
+            path = caramel.theme().resolve(dir + '/' + code + '.json');
+            if (!new File(path).isExists()) {
+                return text;
+            }
+            language = (languages[code] = require(path));
+            if (log.isDebugEnabled()) {
+                log.debug('Language json loaded : ' + path);
+            }
+        }
+        return language[text] || caramel.translate(text);
     };
 
     var globals = function () {
         log.info('Globals method called');
     };
 
-    var getPublicDir=function(){
+    var getPublicDir = function () {
         return PUBLIC_DIR;
     }
 
@@ -114,7 +135,8 @@ var engine = (function () {
         var base = getPath(dir);//'/themes/default/' + dir;
         var dir = new File(base);
         log.info('Registering helpers');
-        handleBars._getPublicDir=getPublicDir;
+        handleBars._getPublicDir = getPublicDir;
+        handleBars._translate = translate;
         recursiveRegister(dir, function (file) {
 
             var helper = base + '/' + file.getName();
@@ -221,17 +243,17 @@ var engine = (function () {
 
         //var compiledPage = Handlebars.compile(pageContent);
         //print(compiledPage(contexts));
-        var params={
-            page:page,
-            contexts:contexts,
-            Handlebars:Handlebars
+        var params = {
+            page: page,
+            contexts: contexts,
+            Handlebars: Handlebars
         }
 
         //Call the process method of all plugins
-        executePluginAction(plugins,'process',params);
+        executePluginAction(plugins, 'process', params);
 
         //Call the output method so that an appropriate plug-in will do the rendering
-        executePluginAction(plugins,'output',params,true);
+        executePluginAction(plugins, 'output', params, true);
     };
 
     /**
@@ -243,9 +265,9 @@ var engine = (function () {
     var executePluginAction = function (plugins, action, params, check) {
 
         var plugin;
-        var page=params.page;
-        var Handlebars=params.Handlebars;
-        var contexts=params.contexts;
+        var page = params.page;
+        var Handlebars = params.Handlebars;
+        var contexts = params.contexts;
         var meta = caramel.meta();
         var check = check || false; //Call the check method of the plug-in before invoking action
 
@@ -283,7 +305,7 @@ var engine = (function () {
         globals: globals,
         init: init,
         render: render,
-        use:use
+        use: use
     };
 
 }());

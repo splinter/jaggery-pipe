@@ -178,7 +178,7 @@ var helpers = function (Handlebars) {
     };
 
     var t = function (text) {
-        return translate(text) || text;
+        return Handlebars._translate(text) || text;
     };
 
     var json = function (obj) {
