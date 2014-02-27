@@ -139,7 +139,7 @@ var helpers = function (Handlebars) {
         }
         url = theme.url;
         for (i = 0; i < length; i++) {
-            html += renderCSS(url.call(theme, 'css/' + css[i]));
+            html += renderCSS(url.call(theme,Handlebars._getPublicDir()+ 'css/' + css[i]));
         }
         return new Handlebars.SafeString(html);
     };

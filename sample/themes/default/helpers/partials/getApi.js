@@ -3,6 +3,6 @@ var resources=function(page,meta){
     log.info('Resources method called');
     return{
         js:['getApi.js'],
-        css:[]
+        css:['common.css']
     }
 };
