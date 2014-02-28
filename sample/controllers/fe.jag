@@ -50,9 +50,39 @@ router.app.get('/document/:type/:id', document.getDocument);
 
 router.app.get('/asset/api/:id',api.getApi);
 
-pipe.resolve(request,response,session);
+//pipe.resolve(request,response,session);
 
 //log.info(getFileName('test-api.jag'));
 
+var entity=require('/modules/entity.js').entity;
+var utils=require('/modules/utils.js');
+
+var AssetSchema=new entity.EntitySchema('Asset',{
+    id:Number,
+    name:String,
+    type:String
+});
+
+AssetSchema.methods.sayHello=function(){
+    return 'Hello, my name is '+this.name;
+}
+
+AssetSchema.static.getAllTypes=function(){
+    return ['gadgets','sites'] ;
+};
+
+var Asset=entity.Entity('Asset');
+
+
+var firstAsset=new Asset();
+firstAsset.name='John';
+
+var secondAsset=new Asset({name:'Smith', type:'Gadget'});
+
+log.info(secondAsset.sayHello());
+log.info(firstAsset.sayHello());
+
+secondAsset.save();
+//log.info(Asset.getAllTypes());
 
 %>
