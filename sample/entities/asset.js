@@ -15,3 +15,6 @@ var Asset=new ef.EntitySchema('Asset',{
     inheritPlugins:false
 });
 
+
+Asset.plug()
+
