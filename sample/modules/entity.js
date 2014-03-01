@@ -69,21 +69,36 @@ var entity = {};
 
     EntitySchema.prototype.save = function (entity) {
         var entity=entity.toJSON();
-        log.info('at save: ' + stringify(this.meta.plugins));
         var preSave = this.meta.plugins.save.pre;
         var postSave = this.meta.plugins.save.post;
-        log.info('plugins: ' + stringify(this.meta.plugins.save.pre));
+
         executePluginList(entity, preSave);
-        log.info('Asset saved!');
+
         executePluginList(entity, postSave);
     };
 
-    EntitySchema.prototype.init = function () {
+    EntitySchema.prototype.init = function (entity) {
+        var entity=entity.toJSON();
+        var pre=this.meta.plugins.init.pre;
+        var post=this.meta.plugins.init.post;
 
+        executePluginList(entity,pre);
+        log.info('Entity initialized');
+        executePluginList(entity,post);
     };
 
     EntitySchema.prototype.validate = function () {
 
+    };
+
+    EntitySchema.prototype.remove=function(){
+        var entity=entity.toJSON();
+        var pre=this.meta.plugins.remove.pre;
+        var post=this.meta.plugins.remove.post;
+
+        executePluginList(entity,pre);
+        log.info('Entity removed!');
+        executePluginList(entity,post);
     };
 
 
@@ -166,9 +181,12 @@ var entity = {};
     };
 
     var initHandler = function () {
-        log.info('Init method called');
+        this.getSchema().init(this);
     };
-
+    /**
+     * The toJSON method
+     * @returns {{}}
+     */
     var toJSON = function () {
         var data = {};
         utils.reflection.copyProps(data, this);
@@ -176,17 +194,15 @@ var entity = {};
     };
 
     var saveHandler = function () {
-        var props = utils.reflection.getProps(this);
-        log.info(stringify(props));
         this.getSchema().save(this);
     };
 
     var removeHandler = function () {
-
+        this.getSchema().remove(this);
     };
 
     var validateHandler = function () {
-
+        this.getSchema().validate(this);
     };
 
 
