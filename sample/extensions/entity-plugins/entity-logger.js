@@ -13,6 +13,8 @@ var entityPlugin = function (Schema) {
         log.info(stringify(entity));
     });
 
-    Schema.sa
+    Schema.post('save',function(entity){
+       log.info('Entity saved successfully');
+    });
 
 };

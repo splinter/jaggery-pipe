@@ -57,50 +57,50 @@ var entity = {};
         initPlugins(action, this.meta.plugins);
 
         this.meta.plugins[action].pre.push(handler);
+        log.info(this.meta.plugins);
     };
 
-    EntitySchema.prototype.post = function (action,handler) {
+    EntitySchema.prototype.post = function (action, handler) {
 
         initPlugins(action, this.meta.plugins);
 
         this.meta.plugins[action].post.push(handler);
     };
 
-    EntitySchema.prototype.save = function () {
-         var preSave=this.meta.plugins.save.pre;
-         var postSave=this.meta.plugins.save.post;
-
-        executePluginList(preSave);
+    EntitySchema.prototype.save = function (entity) {
+        var entity=entity.toJSON();
+        log.info('at save: ' + stringify(this.meta.plugins));
+        var preSave = this.meta.plugins.save.pre;
+        var postSave = this.meta.plugins.save.post;
+        log.info('plugins: ' + stringify(this.meta.plugins.save.pre));
+        executePluginList(entity, preSave);
         log.info('Asset saved!');
-        executePluginList(postSave);
+        executePluginList(entity, postSave);
     };
 
-    EntitySchema.prototype.init=function(){
-
-    };
-
-    EntitySchema.prototype.validate=function(){
+    EntitySchema.prototype.init = function () {
 
     };
 
+    EntitySchema.prototype.validate = function () {
+
+    };
 
 
     /**
      * The function allows a plugin to install itself for the schema
      * @param plugin  The plug-in to be installed to the schema
      */
-    EntitySchema.prototype.plug=function(plugin){
+    EntitySchema.prototype.plug = function (plugin) {
         plugin(this);
     };
-
-
 
 
     var initPlugins = function (action, plugins) {
         if (!plugins.hasOwnProperty(action)) {
             plugins[action] = {};
-            plugins[action].pre=[];
-            plugins[action].post=[];
+            plugins[action].pre = [];
+            plugins[action].post = [];
         }
     };
 
@@ -110,16 +110,24 @@ var entity = {};
      * @param plugins
      */
     var executePluginList = function (entity, plugins) {
-        var index = 0;
+        if (plugins.length == 0) {
+            return;
+        }
+        var index = -1;
 
+        log.info('Plugins: ' + stringify(plugins));
+        log.info(plugins[index]);
         var next = function (entity, index) {
             if (plugins.length < index) {
                 return;
             }
             else {
+                index++;
                 return plugins[index](entity, next);
             }
-        }
+        };
+
+        next(entity, index);
     };
 
     /**
@@ -144,7 +152,7 @@ var entity = {};
             this.init();
         };
 
-        ptr.prototype.getSchema=function(){
+        ptr.prototype.getSchema = function () {
             return schema;
         };
 
@@ -152,6 +160,7 @@ var entity = {};
         ptr.prototype.remove = removeHandler;
         ptr.prototype.validate = validateHandler;
         ptr.prototype.init = initHandler;
+        ptr.prototype.toJSON=toJSON;
 
         return ptr;
     };
@@ -160,11 +169,16 @@ var entity = {};
         log.info('Init method called');
     };
 
+    var toJSON = function () {
+        var data = {};
+        utils.reflection.copyProps(data, this);
+        return data;
+    };
 
     var saveHandler = function () {
         var props = utils.reflection.getProps(this);
         log.info(stringify(props));
-        this.getSchema().save();
+        this.getSchema().save(this);
     };
 
     var removeHandler = function () {
