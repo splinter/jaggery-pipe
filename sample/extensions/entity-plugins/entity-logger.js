@@ -17,4 +17,8 @@ var entityPlugin = function (Schema) {
        log.info('Entity saved successfully');
     });
 
+    Schema.pre('init',function(entity){
+        log.info('Initialize called');
+    });
+
 };

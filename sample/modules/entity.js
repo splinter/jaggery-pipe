@@ -50,7 +50,20 @@ var entity = {};
 
         this.methods = {};
         this.static = {};
+        //initPlugins(this);
+
+        this.meta.plugins.save={pre:[],post:[]};
+        this.meta.plugins.init={pre:[],post:[]};
+        this.meta.plugins.validate={pre:[],post:[]};
+        this.meta.plugins.remove={pre:[],post:[]};
     }
+
+    var initPlugins=function(schema){
+        schema.meta.plugins.save={pre:[],post:[]};
+        schema.meta.plugins.init={pre:[],post:[]};
+        schema.meta.plugins.validate={pre:[],post:[]};
+        schema.meta.plugins.remove={pre:[],post:[]};
+    };
 
     EntitySchema.prototype.pre = function (action, handler) {
 
@@ -73,7 +86,7 @@ var entity = {};
         var postSave = this.meta.plugins.save.post;
 
         executePluginList(entity, preSave);
-
+        log.info('Entity saved');
         executePluginList(entity, postSave);
     };
 
