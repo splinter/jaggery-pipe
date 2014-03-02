@@ -33,11 +33,29 @@ var entity = {};
      */
     EntityManager.prototype.entity = function (schemaName) {
         if (this.generators.hasOwnProperty(schemaName)) {
-            return this.generators[schemaName];
+            var generator= this.generators[schemaName];
+            var schema=this.schemas[schemaName];
+
+            //Attach the static methods
+            attachStaticMethods(generator,schema);
+
+            //TODO:Cache this the first time so we don't loop
+            return generator;
         }
         return null;
     };
 
+    /**
+     * The function adds static methods defined in the schema to the
+     * generator function
+     * @param generator
+     * @param schema
+     */
+    var attachStaticMethods=function(generator,schema){
+        for(var index in schema.static){
+            generator[index]=schema.static[index];
+        }
+    };
 
     function EntitySchema(entityName, entityProps, entityMeta) {
         this.meta = entityMeta || {};
@@ -49,7 +67,8 @@ var entity = {};
         EntitySchema._em.register(this);
 
         this.methods = {};
-        this.static = {};
+        this.static={};
+
         //initPlugins(this);
 
         this.meta.plugins.save={pre:[],post:[]};
@@ -190,7 +209,20 @@ var entity = {};
         ptr.prototype.init = initHandler;
         ptr.prototype.toJSON=toJSON;
 
+        log.info('Check static method');
+        log.info(stringify(schema.static));
+        attachStaticMethods(ptr,schema);
+
         return ptr;
+    };
+
+    var attachStaticMethods=function(obj,schema){
+
+      for(var index in schema.static){
+          log.info('Static method: '+index);
+         obj[index]=schema.static[index];
+      }
+
     };
 
     var initHandler = function () {

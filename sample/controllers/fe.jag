@@ -76,6 +76,7 @@ AssetSchema.plug(entityLogger);
 
 var Asset=entity.Entity('Asset');
 
+//Asset.test\();
 
 var firstAsset=new Asset();
 firstAsset.name='John';
@@ -86,6 +87,6 @@ log.info(secondAsset.sayHello());
 log.info(firstAsset.sayHello());
 
 secondAsset.save();
-//log.info(Asset.getAllTypes());
+log.info(Asset.getAllTypes());
 
 %>
