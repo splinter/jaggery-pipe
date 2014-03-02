@@ -5,7 +5,7 @@ var entity = {};
 
 (function () {
 
-    var entityManager = new EntityManager();
+
     var log = new Log('jaggery-entity');
     var utils = require('/modules/utils.js');
 
@@ -58,7 +58,6 @@ var entity = {};
     };
 
     var DEFAULT_FIELD_TYPE = 'string';
-
     var DEFAULT_REQUIRED = false;
     var DEFAULT_STRING_VALUE = '';
     var DEFAULT_NUM_VALUE = 0;
@@ -317,6 +316,17 @@ var entity = {};
     var getEntity = function (schemaName) {
         return entityManager.entity(schemaName);
     };
+
+    var entityManager;
+    if(!session.get('enManager')){
+        log.info('Caching Entity Manager');
+        entityManager = new EntityManager();
+        session.put('enManager',entityManager);
+    }
+    else{
+        log.info('Using cached Entity Manager');
+        entityManager=session.get('enManager');
+    }
 
     EntitySchema._em = entityManager;
 
