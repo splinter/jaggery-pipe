@@ -61,7 +61,8 @@ var entityLogger=require('/extensions/entity-plugins/entity-logger.js').entityPl
 var AssetSchema=new entity.EntitySchema('Asset',{
     id:Number,
     name:String,
-    type:String
+    type:String,
+    path:{type:String, required:true,default:'_system'}
 });
 
 AssetSchema.methods.sayHello=function(){
@@ -88,5 +89,7 @@ log.info(firstAsset.sayHello());
 
 secondAsset.save();
 log.info(Asset.getAllTypes());
+
+log.info(firstAsset.path);
 
 %>

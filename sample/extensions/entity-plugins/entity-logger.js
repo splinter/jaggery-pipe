@@ -18,7 +18,7 @@ var entityPlugin = function (Schema) {
     });
 
     Schema.pre('init',function(entity){
-        log.info('Initialize called');
+        log.info('Initialize called '+Schema.meta.name);
     });
 
 };

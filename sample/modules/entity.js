@@ -33,11 +33,11 @@ var entity = {};
      */
     EntityManager.prototype.entity = function (schemaName) {
         if (this.generators.hasOwnProperty(schemaName)) {
-            var generator= this.generators[schemaName];
-            var schema=this.schemas[schemaName];
+            var generator = this.generators[schemaName];
+            var schema = this.schemas[schemaName];
 
             //Attach the static methods
-            attachStaticMethods(generator,schema);
+            attachStaticMethods(generator, schema);
 
             //TODO:Cache this the first time so we don't loop
             return generator;
@@ -51,10 +51,56 @@ var entity = {};
      * @param generator
      * @param schema
      */
-    var attachStaticMethods=function(generator,schema){
-        for(var index in schema.static){
-            generator[index]=schema.static[index];
+    var attachStaticMethods = function (generator, schema) {
+        for (var index in schema.static) {
+            generator[index] = schema.static[index];
         }
+    };
+
+    var DEFAULT_FIELD_TYPE = 'string';
+
+    var DEFAULT_REQUIRED = false;
+    var DEFAULT_STRING_VALUE = '';
+    var DEFAULT_NUM_VALUE = 0;
+    var DEFAULT_BOOL_VALUE = false;
+
+    /**
+     * The class is used to describe a field type
+     */
+    function FieldType(options) {
+        this.type = DEFAULT_FIELD_TYPE;
+        this.default = '';
+        this.required = DEFAULT_REQUIRED;
+        utils.reflection.copyProps(options, this);
+
+        this.type = typeof this.type();
+        //Assign default values based on the type
+        this.default = this.default ? this.default : getDefaultValues(this.type);
+    }
+
+    /**
+     * The function will assign the default value based on the type
+     * @param fieldType
+     * @param field
+     */
+    var getDefaultValues = function (fieldType) {
+        var value;
+        switch (fieldType) {
+            case 'string':
+                value = DEFAULT_STRING_VALUE;
+                break;
+            case 'number':
+                value = DEFAULT_NUM_VALUE;
+                break;
+            case 'boolean':
+                value = DEFAULT_BOOL_VALUE;
+                break;
+            default:
+                value = DEFAULT_STRING_VALUE;
+                break;
+        }
+
+        return value;
     };
 
     function EntitySchema(entityName, entityProps, entityMeta) {
@@ -63,25 +109,43 @@ var entity = {};
         this.meta.name = entityName;
         this.meta.plugins = {};
 
+        resolveTypes(entityProps);
+
         //Register the schema
         EntitySchema._em.register(this);
 
         this.methods = {};
-        this.static={};
+        this.static = {};
 
-        //initPlugins(this);
-
-        this.meta.plugins.save={pre:[],post:[]};
-        this.meta.plugins.init={pre:[],post:[]};
-        this.meta.plugins.validate={pre:[],post:[]};
-        this.meta.plugins.remove={pre:[],post:[]};
+        this.meta.plugins.save = {pre: [], post: []};
+        this.meta.plugins.init = {pre: [], post: []};
+        this.meta.plugins.validate = {pre: [], post: []};
+        this.meta.plugins.remove = {pre: [], post: []};
     }
 
-    var initPlugins=function(schema){
-        schema.meta.plugins.save={pre:[],post:[]};
-        schema.meta.plugins.init={pre:[],post:[]};
-        schema.meta.plugins.validate={pre:[],post:[]};
-        schema.meta.plugins.remove={pre:[],post:[]};
+    /**
+     * The function resolves the types of each of the
+     * properties
+     * @param props
+     */
+    var resolveTypes = function (props) {
+
+        var fieldType;
+
+        for (var key in props) {
+
+            //If it is a function it is one of the in built types
+            if (typeof props[key] == 'function') {
+                //We need to create an instance of the FieldType
+                fieldType = new FieldType({type: props[key]});
+            }
+            else {
+                //The user has provided an object, fill in any missing values
+                fieldType = new FieldType(props[key]);
+            }
+
+            props[key] = fieldType;
+        }
     };
 
     EntitySchema.prototype.pre = function (action, handler) {
@@ -89,7 +153,6 @@ var entity = {};
         initPlugins(action, this.meta.plugins);
 
         this.meta.plugins[action].pre.push(handler);
-        log.info(this.meta.plugins);
     };
 
     EntitySchema.prototype.post = function (action, handler) {
@@ -100,7 +163,7 @@ var entity = {};
     };
 
     EntitySchema.prototype.save = function (entity) {
-        var entity=entity.toJSON();
+        var entity = entity.toJSON();
         var preSave = this.meta.plugins.save.pre;
         var postSave = this.meta.plugins.save.post;
 
@@ -110,29 +173,38 @@ var entity = {};
     };
 
     EntitySchema.prototype.init = function (entity) {
-        var entity=entity.toJSON();
-        var pre=this.meta.plugins.init.pre;
-        var post=this.meta.plugins.init.post;
+        var entity = entity.toJSON();
+        var pre = this.meta.plugins.init.pre;
+        var post = this.meta.plugins.init.post;
 
-        executePluginList(entity,pre);
+        executePluginList(entity, pre);
         log.info('Entity initialized');
-        executePluginList(entity,post);
+        executePluginList(entity, post);
     };
 
     EntitySchema.prototype.validate = function () {
 
     };
 
-    EntitySchema.prototype.remove=function(){
-        var entity=entity.toJSON();
-        var pre=this.meta.plugins.remove.pre;
-        var post=this.meta.plugins.remove.post;
+    EntitySchema.prototype.remove = function () {
+        var entity = entity.toJSON();
+        var pre = this.meta.plugins.remove.pre;
+        var post = this.meta.plugins.remove.post;
 
-        executePluginList(entity,pre);
+        executePluginList(entity, pre);
         log.info('Entity removed!');
-        executePluginList(entity,post);
+        executePluginList(entity, post);
     };
 
+    /**
+     * The function creates properties in an entity instance
+     * @param entity
+     */
+    EntitySchema.prototype.fillProps = function (entity) {
+        for (var key in this.props) {
+            entity[key] = this.props[key].default;
+        }
+    }
 
     /**
      * The function allows a plugin to install itself for the schema
@@ -162,8 +234,6 @@ var entity = {};
         }
         var index = -1;
 
-        log.info('Plugins: ' + stringify(plugins));
-        log.info(plugins[index]);
         var next = function (entity, index) {
             if (plugins.length < index) {
                 return;
@@ -187,7 +257,7 @@ var entity = {};
         var ptr = function (options) {
 
             //Add the properties that should be present based on the schema
-            utils.reflection.copyPropKeys(schema.props, this);
+            schema.fillProps(this);
 
             utils.reflection.copyProps(options, this);
 
@@ -207,23 +277,11 @@ var entity = {};
         ptr.prototype.remove = removeHandler;
         ptr.prototype.validate = validateHandler;
         ptr.prototype.init = initHandler;
-        ptr.prototype.toJSON=toJSON;
-
-        log.info('Check static method');
-        log.info(stringify(schema.static));
-        attachStaticMethods(ptr,schema);
+        ptr.prototype.toJSON = toJSON;
 
         return ptr;
     };
 
-    var attachStaticMethods=function(obj,schema){
-
-      for(var index in schema.static){
-          log.info('Static method: '+index);
-         obj[index]=schema.static[index];
-      }
-
-    };
 
     var initHandler = function () {
         this.getSchema().init(this);
