@@ -49,6 +49,16 @@ var engine = (function () {
     };
 
     /**
+     * The function checks whether default plug-ins have been registered if not
+     * a set of default plugins are added.
+     */
+    var loadDefaultPlugins=function(){
+        if(plugins.length==0){
+
+        }
+    };
+
+    /**
      * The following function will check if a translation file is available for the provided
      * language in the i18n folder.If a translation is found it used to perform the translation,else
      * the core translate method is invoked.
