@@ -1,6 +1,9 @@
 var reflection = {};
+var xml={};
 
-
+/**
+ * Description: The script encapsulates any reflection related utility functions
+ */
 (function () {
 
     var log = new Log('utils-reflection');
@@ -44,7 +47,21 @@ var reflection = {};
                 log.info('key: ' + key);
             }
         }
-    }
+    };
+
+    var getDiff=function(a,b,diff){
+
+    };
+
+    /**
+     * The function calculates the differences between two simple JSON objects
+     * @param a  The object with which b is compared
+     * @param b  The target of the comparison
+     * @return An object which records the differences between the two objects
+     */
+    reflection.diff=function(a,b){
+
+    };
 
 
 

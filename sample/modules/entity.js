@@ -70,12 +70,20 @@ var entity = {};
         this.type = DEFAULT_FIELD_TYPE;
         this.default = '';
         this.required = DEFAULT_REQUIRED;
+        this.validations = [];    //A validation object
         utils.reflection.copyProps(options, this);
 
         this.type = typeof this.type();
         //Assign default values based on the type
         this.default = this.default ? this.default : getDefaultValues(this.type);
+
+        resolveDefaultValidations(this);
     }
+
+    FieldType.prototype.validation = function (validator, msg) {
+        this.validations.push({msg: (msg || 'No error message defined'),
+            validator: validator});
+    };
 
     /**
      * The function will assign the default value based on the type
@@ -118,9 +126,13 @@ var entity = {};
 
         this.meta.plugins.save = {pre: [], post: []};
         this.meta.plugins.init = {pre: [], post: []};
-        this.meta.plugins.validate = {pre: [], post: []};
+        //this.meta.plugins.validate = {pre: [], post: []};
         this.meta.plugins.remove = {pre: [], post: []};
+
+        //Attach validations
+        attachValidations(this);
     }
+
 
     /**
      * The function resolves the types of each of the
@@ -147,6 +159,40 @@ var entity = {};
         }
     };
 
+    /**
+     * The function adds the default validations for a given field type
+     */
+    var resolveDefaultValidations = function (fieldSchema) {
+        if (fieldSchema.required) {
+            log.info('Adding required field validator');
+            fieldSchema.validations.push({msg: 'Required field', validator: requiredFieldValidator});
+        }
+    };
+
+    var requiredFieldValidator = function (fieldSchema, fieldValue) {
+        log.info('Checking required field');
+        if ((!fieldValue) || (fieldValue == '')) {
+            return false;
+        }
+
+        return true;
+    };
+
+    /**
+     * The function is used to return a reference to a field
+     * @param fieldName
+     * @returns {*}
+     */
+    EntitySchema.prototype.field = function (fieldName) {
+        for (var key in this.props) {
+            if (key == fieldName) {
+                return this.props[key];
+            }
+        }
+
+        return null;
+    };
+
     EntitySchema.prototype.pre = function (action, handler) {
 
         initPlugins(action, this.meta.plugins);
@@ -162,7 +208,10 @@ var entity = {};
     };
 
     EntitySchema.prototype.save = function (entity) {
+
+        log.info(stringify(entity));
         var entity = entity.toJSON();
+        log.info(stringify(entity));
         var preSave = this.meta.plugins.save.pre;
         var postSave = this.meta.plugins.save.post;
 
@@ -181,9 +230,43 @@ var entity = {};
         executePluginList(entity, post);
     };
 
-    EntitySchema.prototype.validate = function () {
+    var attachValidations = function (schema) {
 
+        var errors = {};
+
+        schema.pre('save', function (entity) {
+
+            log.info('Performing validations');
+
+            //Go through each field and invoke the validations
+            for (var key in schema.props) {
+
+                log.info('Validating ' + key+ '= '+entity[key]);
+
+                var validations = schema.props[key].validations;
+
+                //Execute all validators defined in the
+                for (var index in validations) {
+
+                    var isFailed = validations[index].validator(entity[key], schema.props[key]);
+
+                    //Record the error
+                    if (isFailed) {
+
+                        if(!errors[key]){
+                            errors[key]={};
+                        }
+
+                        errors[key].value = entity[key];
+                        errors[key].message = validations[index].msg;
+                    }
+                }
+            }
+
+            log.info(errors);
+        });
     };
+
 
     EntitySchema.prototype.remove = function () {
         var entity = entity.toJSON();
@@ -242,7 +325,6 @@ var entity = {};
                 return plugins[index](entity, next);
             }
         };
-
         next(entity, index);
     };
 
@@ -291,7 +373,7 @@ var entity = {};
      */
     var toJSON = function () {
         var data = {};
-        utils.reflection.copyProps(data, this);
+        utils.reflection.copyProps(this,data);
         return data;
     };
 
@@ -318,14 +400,14 @@ var entity = {};
     };
 
     var entityManager;
-    if(!session.get('enManager')){
+    if (!session.get('enManager')) {
         log.info('Caching Entity Manager');
         entityManager = new EntityManager();
-        session.put('enManager',entityManager);
+        session.put('enManager', entityManager);
     }
-    else{
+    else {
         log.info('Using cached Entity Manager');
-        entityManager=session.get('enManager');
+        entityManager = session.get('enManager');
     }
 
     EntitySchema._em = entityManager;
