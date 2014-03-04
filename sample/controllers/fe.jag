@@ -73,7 +73,7 @@ AssetSchema.static.getAllTypes=function(){
     return ['gadgets','sites'] ;
 };
 
-AssetSchema.plugin(entityLogger);
+AssetSchema.plugin(entityLogger,{title:'Tester'});
 
 var Asset=entity.Entity('Asset');
 
@@ -91,5 +91,6 @@ secondAsset.save();
 log.info(Asset.getAllTypes());
 
 log.info(firstAsset.path);
+//log.info(firstAsset.logType);
 
 %>

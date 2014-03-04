@@ -207,11 +207,22 @@ var entity = {};
         this.meta.plugins[action].post.push(handler);
     };
 
-    EntitySchema.prototype.save = function (entity) {
+    /**
+     * The function allows a plugin to define extra properties
+     * @param options An object containing properties to be added to the schema
+     */
+    EntitySchema.prototype.add = function (options) {
+        resolveTypes(options);
 
-        log.info(stringify(entity));
+        //Add each property in the options object to the properties
+        for (var key in options) {
+            this.props[key] = options[key];
+        }
+    };
+
+    EntitySchema.prototype.save = function (entity) {
         var entity = entity.toJSON();
-        log.info(stringify(entity));
+
         var preSave = this.meta.plugins.save.pre;
         var postSave = this.meta.plugins.save.post;
 
@@ -230,18 +241,22 @@ var entity = {};
         executePluginList(entity, post);
     };
 
+    /**
+     * The function attches validations to occur before the save method is invoked
+     * @param schema
+     */
     var attachValidations = function (schema) {
 
         var errors = {};
 
-        schema.pre('save', function (entity) {
+        schema.pre('save', function (entity, next) {
 
             log.info('Performing validations');
 
             //Go through each field and invoke the validations
             for (var key in schema.props) {
 
-                log.info('Validating ' + key+ '= '+entity[key]);
+                log.info('Validating ' + key + '= ' + entity[key]);
 
                 var validations = schema.props[key].validations;
 
@@ -253,8 +268,8 @@ var entity = {};
                     //Record the error
                     if (isFailed) {
 
-                        if(!errors[key]){
-                            errors[key]={};
+                        if (!errors[key]) {
+                            errors[key] = {};
                         }
 
                         errors[key].value = entity[key];
@@ -262,6 +277,7 @@ var entity = {};
                     }
                 }
             }
+            next();
 
             log.info(errors);
         });
@@ -292,8 +308,9 @@ var entity = {};
      * The function allows a plugin to install itself for the schema
      * @param plugin  The plug-in to be installed to the schema
      */
-    EntitySchema.prototype.plugin = function (plugin) {
-        plugin(this);
+    EntitySchema.prototype.plugin = function (plugin, options) {
+        var options = options || {};
+        plugin(this, options);
     };
 
 
@@ -316,16 +333,19 @@ var entity = {};
         }
         var index = -1;
 
-        var next = function (entity, index) {
+        var next = function () {
+
             if (plugins.length < index) {
                 return;
             }
             else {
                 index++;
+                log.info('index: ' + index);
                 return plugins[index](entity, next);
             }
         };
-        next(entity, index);
+
+        next();
     };
 
     /**
@@ -373,7 +393,7 @@ var entity = {};
      */
     var toJSON = function () {
         var data = {};
-        utils.reflection.copyProps(this,data);
+        utils.reflection.copyProps(this, data);
         return data;
     };
 

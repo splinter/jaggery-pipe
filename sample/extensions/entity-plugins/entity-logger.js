@@ -3,22 +3,26 @@
  * of an asset
  * Filename:entity-logger.js
  */
-var entityPlugin = function (Schema) {
+var entityPlugin = function (schema,options) {
     var log = new Log('entity-logger');
 
-    log.info('entity-logger plugin registered');
+    log.info('entity-logger plugin registered with '+stringify(options));
 
-    Schema.pre('save', function (entity) {
-        log.info('Before been saved');
+    schema.add({
+        logType:{type:String,default:'Simple Logger'}
+    });
+
+    schema.pre('save', function (entity) {
+        log.info('Before been saved '+options.title);
         log.info(stringify(entity));
     });
 
-    Schema.post('save',function(entity){
-       log.info('Entity saved successfully');
+    schema.post('save',function(entity){
+       log.info('Entity saved successfully '+options.title);
     });
 
-    Schema.pre('init',function(entity){
-        log.info('Initialize called '+Schema.meta.name);
+    schema.pre('init',function(entity){
+        log.info('Initialize called '+schema.meta.name);
     });
 
 };
