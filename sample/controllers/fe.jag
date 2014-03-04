@@ -102,6 +102,9 @@ gadget.install();
 
 gadget.save();
 gadget.remove();
+
+Gadget.find();
+Gadget.findAll();
 //log.info(firstAsset.logType);
 
 %>

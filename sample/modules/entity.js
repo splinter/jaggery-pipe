@@ -129,9 +129,11 @@ var entity = {};
         //this.meta.plugins.validate = {pre: [], post: []};
         this.meta.plugins.remove = {pre: [], post: [],to:[]};
 
-
         //Attach validations
         attachValidations(this);
+
+        //Attach default static methods
+        attachDefaultStaticMethods(this);
     }
 
 
@@ -158,6 +160,17 @@ var entity = {};
 
             props[key] = fieldType;
         }
+    };
+
+    var attachDefaultStaticMethods=function(schema){
+       schema.static.find=function(){
+            log.warn('Find method not implemeneted');
+            return [];
+       };
+
+       schema.static.findAll=function(){
+            log.warn('FindAll method not implemented');
+       };
     };
 
     /**
@@ -255,7 +268,7 @@ var entity = {};
     };
 
     /**
-     * The function attches validations to occur before the save method is invoked
+     * The function attaches validations to occur before the save method is invoked
      * @param schema
      */
     var attachValidations = function (schema) {
@@ -311,6 +324,8 @@ var entity = {};
         executePluginList(action,entity,to);
         executePluginList('post'+action,entity, post);
     };
+
+
 
     /**
      * The function creates properties in an entity instance
