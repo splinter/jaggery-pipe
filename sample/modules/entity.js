@@ -292,7 +292,7 @@ var entity = {};
      * The function allows a plugin to install itself for the schema
      * @param plugin  The plug-in to be installed to the schema
      */
-    EntitySchema.prototype.plug = function (plugin) {
+    EntitySchema.prototype.plugin = function (plugin) {
         plugin(this);
     };
 

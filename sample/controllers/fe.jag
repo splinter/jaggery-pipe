@@ -50,10 +50,10 @@ router.app.get('/document/:type/:id', document.getDocument);
 
 router.app.get('/asset/api/:id',api.getApi);
 
-pipe.resolve(request,response,session);
+//pipe.resolve(request,response,session);
 
 
-/*
+
 var entity=require('/modules/entity.js').entity;
 var utils=require('/modules/utils.js');
 var entityLogger=require('/extensions/entity-plugins/entity-logger.js').entityPlugin;
@@ -73,7 +73,7 @@ AssetSchema.static.getAllTypes=function(){
     return ['gadgets','sites'] ;
 };
 
-AssetSchema.plug(entityLogger);
+AssetSchema.plugin(entityLogger);
 
 var Asset=entity.Entity('Asset');
 
@@ -90,6 +90,6 @@ log.info(firstAsset.sayHello());
 secondAsset.save();
 log.info(Asset.getAllTypes());
 
-log.info(firstAsset.path);  */
+log.info(firstAsset.path);
 
 %>
