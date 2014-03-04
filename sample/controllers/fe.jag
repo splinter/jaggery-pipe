@@ -58,6 +58,8 @@ var entity=require('/modules/entity.js').entity;
 var utils=require('/modules/utils.js');
 var entityLogger=require('/extensions/entity-plugins/entity-logger.js').entityPlugin;
 
+require('/entities/gadget.js');
+
 var AssetSchema=new entity.EntitySchema('Asset',{
     id:Number,
     name:String,
@@ -91,6 +93,15 @@ secondAsset.save();
 log.info(Asset.getAllTypes());
 
 log.info(firstAsset.path);
+
+var Gadget=entity.Entity('Gadget');
+
+var gadget=new Gadget();
+
+gadget.install();
+
+gadget.save();
+gadget.remove();
 //log.info(firstAsset.logType);
 
 %>

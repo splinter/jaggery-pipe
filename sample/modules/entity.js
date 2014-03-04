@@ -124,10 +124,11 @@ var entity = {};
         this.methods = {};
         this.static = {};
 
-        this.meta.plugins.save = {pre: [], post: []};
-        this.meta.plugins.init = {pre: [], post: []};
+        this.meta.plugins.save = {pre: [], post: [], to:[]};
+        this.meta.plugins.init = {pre: [], post: [],to:[]};
         //this.meta.plugins.validate = {pre: [], post: []};
-        this.meta.plugins.remove = {pre: [], post: []};
+        this.meta.plugins.remove = {pre: [], post: [],to:[]};
+
 
         //Attach validations
         attachValidations(this);
@@ -207,6 +208,10 @@ var entity = {};
         this.meta.plugins[action].post.push(handler);
     };
 
+    EntitySchema.prototype.to=function(action,handler){
+        this.meta.plugins[action].to.push(handler);
+    };
+
     /**
      * The function allows a plugin to define extra properties
      * @param options An object containing properties to be added to the schema
@@ -225,20 +230,28 @@ var entity = {};
 
         var preSave = this.meta.plugins.save.pre;
         var postSave = this.meta.plugins.save.post;
+        var toSave=this.meta.plugins.save.to;
+        var action='save';
 
-        executePluginList(entity, preSave);
-        log.info('Entity saved');
-        executePluginList(entity, postSave);
+        executePluginList('pre'+action,entity, preSave);
+        executePluginList(action,entity,toSave);
+        executePluginList('post'+action,entity, postSave);
     };
 
+    /**
+     * The function will invoke any initialization logic on the entity which invokes this method
+     * @param entity  The entity which has invoked the init method
+     */
     EntitySchema.prototype.init = function (entity) {
         var entity = entity.toJSON();
         var pre = this.meta.plugins.init.pre;
         var post = this.meta.plugins.init.post;
+        var to=this.meta.plugins.init.to;
+        var action='init';
 
-        executePluginList(entity, pre);
-        log.info('Entity initialized');
-        executePluginList(entity, post);
+        executePluginList('pre'+action,entity, pre);
+        executePluginList(action,entity,to);
+        executePluginList('post'+action,entity, post);
     };
 
     /**
@@ -278,20 +291,25 @@ var entity = {};
                 }
             }
             next();
-
+            log.info('Finished validating....');
             log.info(errors);
         });
     };
 
-
-    EntitySchema.prototype.remove = function () {
+    /**
+     * The function is called whenever the current entity needs to be removed.It will call any plugins
+     * registered to remove the entity.
+     */
+    EntitySchema.prototype.remove = function (entity) {
         var entity = entity.toJSON();
         var pre = this.meta.plugins.remove.pre;
         var post = this.meta.plugins.remove.post;
+        var to=this.meta.plugins.remove.to;
+        var action='remove';
 
-        executePluginList(entity, pre);
-        log.info('Entity removed!');
-        executePluginList(entity, post);
+        executePluginList('pre'+action,entity, pre);
+        executePluginList(action,entity,to);
+        executePluginList('post'+action,entity, post);
     };
 
     /**
@@ -327,21 +345,23 @@ var entity = {};
      * giving plug-in the option to continue to the next or stop processing
      * @param plugins
      */
-    var executePluginList = function (entity, plugins) {
+    var executePluginList = function (action,entity, plugins) {
         if (plugins.length == 0) {
+            log.warn('No plugins defined for '+action);
             return;
         }
-        var index = -1;
+
+        var index = 0;
 
         var next = function () {
+            var plugin=plugins[index];
+            index++;
 
             if (plugins.length < index) {
                 return;
             }
             else {
-                index++;
-                log.info('index: ' + index);
-                return plugins[index](entity, next);
+                return plugin(entity, next);
             }
         };
 
@@ -383,10 +403,10 @@ var entity = {};
         return ptr;
     };
 
-
     var initHandler = function () {
         this.getSchema().init(this);
     };
+
     /**
      * The toJSON method
      * @returns {{}}
@@ -419,8 +439,8 @@ var entity = {};
         return entityManager.entity(schemaName);
     };
 
-    var entityManager;
-    if (!session.get('enManager')) {
+    var entityManager=new EntityManager();;
+   /* if (!session.get('enManager')) {
         log.info('Caching Entity Manager');
         entityManager = new EntityManager();
         session.put('enManager', entityManager);
@@ -428,7 +448,7 @@ var entity = {};
     else {
         log.info('Using cached Entity Manager');
         entityManager = session.get('enManager');
-    }
+    } */
 
     EntitySchema._em = entityManager;
 
