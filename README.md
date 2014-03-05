@@ -98,7 +98,7 @@ In addition to using the print statement,the router plug-in can use a renderer t
        msg: 'Hello, I am a json object'
      };
      
-     res._render(data);
+     res.render(data);
   }
 ```
 You can also set your own renderer per request method type;
