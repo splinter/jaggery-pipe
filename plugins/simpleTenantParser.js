@@ -12,7 +12,7 @@ var handle=function(req,res,session,handlers){
     var tenantId = null;
 
     //Find the t component
-    for (var index = 0; ((index < uriComponents.length) && (tenantId == null)); index++) {
+    for (var index = 0; ((index < uriComponents.length) && (tenantId === null)); index++) {
 
         //Detected the tenant flag
         if (uriComponents[index] == TENANT_URL_TOKEN) {
