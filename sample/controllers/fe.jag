@@ -51,11 +51,11 @@ router.app.get('/document/:type/:id', document.getDocument);
 
 router.app.get('/asset/api/:id',api.getApi);
 
-//pipe.resolve(request,response,session);
+pipe.resolve(request,response,session);
 
 
 
-var entity=require('entity');
+/*var entity=require('entity');
 //var utils=require('/modules/utils.js');
 var entityLogger=require('/extensions/entity-plugins/entity-logger.js').entityPlugin;
 
@@ -119,6 +119,6 @@ log.info(test1.toJSON());
 log.info(test2.toJSON());
 log.info(test3.toJSON());
 log.info(test4.toJSON());
-//log.info(firstAsset.logType);
+//log.info(firstAsset.logType);   */
 
 %>
