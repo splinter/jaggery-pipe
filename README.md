@@ -114,6 +114,23 @@ Similarly you can also set renderers for other methods by using:
 * delete-renderer
 * post-renderer
 
+Static Content Plug-in
+----------------------
+The static content plug-in serves static content from a user defined directory.It is one of the bundled plugins in the pipe-commons module.
+
+```javascript
+   var common=require('pipe-common');
+   
+   //Define the directory from which content will be served
+   common.staticContent.app.setDir('/public');
+   
+   //Use the plugin for any routes with the particular components
+   pipe.plug('themes/default/public/',common.staticContent);
+   
+```
+
+It is a good idea to plugin the static content plug-in further up the chain of the pipe plugins.This would ensure that less plugins are hit before the content is served.
+
 
 Writing a plug-in
 =================
