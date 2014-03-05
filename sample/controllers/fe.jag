@@ -51,17 +51,17 @@ router.app.get('/document/:type/:id', document.getDocument);
 
 router.app.get('/asset/api/:id',api.getApi);
 
-pipe.resolve(request,response,session);
+//pipe.resolve(request,response,session);
 
 
 
-/*var entity=require('jaggery-entity').entity;
+var entity=require('entity');
 //var utils=require('/modules/utils.js');
 var entityLogger=require('/extensions/entity-plugins/entity-logger.js').entityPlugin;
 
 require('/entities/gadget.js');
 
-var AssetSchema=new entity.EntitySchema('Asset',{
+var AssetSchema=new entity.Schema('Asset',{
     id:Number,
     name:String,
     type:String,
@@ -78,7 +78,7 @@ AssetSchema.static.getAllTypes=function(){
 
 AssetSchema.plugin(entityLogger,{title:'Tester'});
 
-var Asset=entity.Entity('Asset');
+var Asset=entity.model('Asset');
 
 //Asset.test\();
 
@@ -95,7 +95,7 @@ log.info(Asset.getAllTypes());
 
 log.info(firstAsset.path);
 
-var Gadget=entity.Entity('Gadget');
+var Gadget=entity.model('Gadget');
 
 var gadget=new Gadget();
 
@@ -105,7 +105,20 @@ gadget.save();
 gadget.remove();
 
 Gadget.find();
-Gadget.findAll();
-//log.info(firstAsset.logType);  */
+Gadget.findOne();
+
+var test1=Gadget.create();
+var test2=Asset.create();
+var test3=Asset.create();
+var test4=Gadget.create();
+
+//var t=test();
+//t.name='Another Gadget';
+
+log.info(test1.toJSON());
+log.info(test2.toJSON());
+log.info(test3.toJSON());
+log.info(test4.toJSON());
+//log.info(firstAsset.logType);
 
 %>

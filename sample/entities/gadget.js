@@ -1,7 +1,7 @@
-var entity=require('jaggery-entity').entity;
+var entity=require('entity');
 
 
-var Gadget=new entity.EntitySchema('Gadget',{
+var Gadget=new entity.Schema('Gadget',{
     name:String,
     id:String,
     type:String,
