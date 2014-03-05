@@ -29,6 +29,7 @@ pipe.plug(common.errHandler);
 
 log.info('env: '+common.errHandler.env());
 
+//Enable to allow routes to inherit from a parent route
 //router.app.config({inheritRoutes:true});
 router.app.utils('get-renderer',caramelRenderer.render);
 

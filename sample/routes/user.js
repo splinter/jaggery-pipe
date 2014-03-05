@@ -7,5 +7,5 @@ var logoutUser = function (req, res,session) {
         msg:'User has been logged out!'
     };
 
-    res._render(data);
+    res.render(data);
 };

@@ -9,14 +9,15 @@ var bodyParser = (function () {
     var handle = function (req, res, session, handlers) {
 
         var content=req.getContent();
-        var contentObj={};
+        var contentObj=content;
+        var contentType=request.getContentType()||'';
 
-        //Only parse if the user has provided any content
-        if(content){
+        //Only parse if the user has provided any application/json content
+        if((content)&&(contentType=='application/json')){
            contentObj=parse(content);
         }
 
-        req._body=contentObj;
+        req.body=contentObj;
 
         handlers();
     };

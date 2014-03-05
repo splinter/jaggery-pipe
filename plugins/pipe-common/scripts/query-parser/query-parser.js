@@ -21,7 +21,7 @@ var queryParser = (function () {
                 data[kv[0]] = kv[1] || '';
             }
 
-            req._query = data;
+            req.query = data;
 
         }
 

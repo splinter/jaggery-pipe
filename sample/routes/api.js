@@ -4,21 +4,21 @@ var getTopApis=function(req,res,session){
        "2":"text-api-2"
    };
 
-    res._render('topApis',data);
+    res.render('topApis',data);
 };
 
 var getApi=function(req,res){
    var data={
-       id:req._params.id,
+       id:req.params.id,
        name:'This is a test api'
    };
-    res._render('getApi',data);
+    res.render('getApi',data);
 };
 
 var getApiOffers=function(req,res){
     var offers=[];
     offers.push({id:'1', 'msg':'Buy one and get two free!'});
-    res._render('apiOffers',offers);
+    res.render('apiOffers',offers);
 }
 
 var putApi=function(req,res){
@@ -26,7 +26,7 @@ var putApi=function(req,res){
         code:200,
         msg:'Api Updated successfully'
     };
-    res._render(data);
+    res.render(data);
 };
 
 var deleteApi=function(req,res){
@@ -34,7 +34,7 @@ var deleteApi=function(req,res){
         code:200,
         msg:'Api deleted successfully!'
     };
-    res._render(data);
+    res.render(data);
 };
 
 var postApi=function(req,res){
@@ -42,5 +42,5 @@ var postApi=function(req,res){
         code:200,
         msg:'Created api'
     };
-    res._render(data);
+    res.render(data);
 };

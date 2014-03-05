@@ -2,20 +2,20 @@ var log = new Log();
 
 var getTopAssets = function (req, res, session) {
     var topAssets = [];
-    var type = req._params.type;
+    var type = req.params.type;
     topAssets.push({id: 1, name: type + '-1'});
     topAssets.push({id: 2, name: type + '-2'});
 
-    res._render('topAssets',topAssets);
+    res.render('topAssets',topAssets);
 };
 
 var getAsset = function (req, res, session) {
     var data={
-        id: req._params.id,
+        id: req.params.id,
         name: 'test-' + req._params.type
     };
     //print('Overriden');
-    res._render('getAsset',data);
+    res.render('getAsset',data);
 };
 
 var getAssetSample = function (req, res, session) {
@@ -23,7 +23,7 @@ var getAssetSample = function (req, res, session) {
        msg:'This is a sample!'
    };
 
-   res._render('getAssetSample',data);
+   res.render('getAssetSample',data);
 };
 
 var putAsset = function (req,res) {
@@ -31,7 +31,7 @@ var putAsset = function (req,res) {
         code:200,
         msg:'Asset updated successfully'
     };
-    res._render(data);
+    res.render(data);
 };
 
 var deleteAsset = function (req,res) {
@@ -40,15 +40,15 @@ var deleteAsset = function (req,res) {
         msg:'Asset deleted successfully'
     };
 
-    res._render(data);
+    res.render(data);
 };
 
 var postAsset = function (req,res) {
-    log.info(req._body);
+    log.info(req.body);
     var data={
         id:1,
-        name:'new '+req._params.type
+        name:'new '+req.params.type
     };
 
-    res._render(data);
+    res.render(data);
 };

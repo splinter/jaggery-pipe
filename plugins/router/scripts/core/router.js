@@ -31,7 +31,7 @@ var handle = function (req, res, session, handlers) {
     var log = new Log();
     var methodType=req.getMethod().toLocaleLowerCase();
     var renderer=app.utils(methodType+'-renderer')||defaultRenderer;
-    res._render=renderer;
+    res.render=renderer;
 
     var result= app.route(req, res, session);
 
@@ -92,7 +92,7 @@ var exec = (function (RouteMap) {
             return { error: 404 , msg:'Could not find route! ', data:{}};
         }
 
-        req._params=match.params;
+        req.params=match.params;
         return match.ref(req,res,session)||{};
         //return {};
     };
