@@ -50,11 +50,11 @@ router.app.get('/document/:type/:id', document.getDocument);
 
 router.app.get('/asset/api/:id',api.getApi);
 
-//pipe.resolve(request,response,session);
+pipe.resolve(request,response,session);
 
 
 
-var entity=require('jaggery-entity').entity;
+/*var entity=require('jaggery-entity').entity;
 //var utils=require('/modules/utils.js');
 var entityLogger=require('/extensions/entity-plugins/entity-logger.js').entityPlugin;
 
@@ -105,6 +105,6 @@ gadget.remove();
 
 Gadget.find();
 Gadget.findAll();
-//log.info(firstAsset.logType);
+//log.info(firstAsset.logType);  */
 
 %>

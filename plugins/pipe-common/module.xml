@@ -5,6 +5,10 @@
         <path>scripts/body-parser/body-parser.js</path>
     </script>
     <script>
+        <name>static-content</name>
+        <path>scripts/static-content/static-content.js</path>
+    </script>
+    <script>
         <name>query-parser.js</name>
         <path>scripts/query-parser/query-parser.js</path>
     </script>
