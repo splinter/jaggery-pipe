@@ -1,4 +1,4 @@
-var entity=require('/modules/entity.js').entity;
+var entity=require('jaggery-entity').entity;
 
 
 var Gadget=new entity.EntitySchema('Gadget',{

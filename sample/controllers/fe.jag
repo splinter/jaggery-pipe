@@ -54,8 +54,8 @@ router.app.get('/asset/api/:id',api.getApi);
 
 
 
-var entity=require('/modules/entity.js').entity;
-var utils=require('/modules/utils.js');
+var entity=require('jaggery-entity').entity;
+//var utils=require('/modules/utils.js');
 var entityLogger=require('/extensions/entity-plugins/entity-logger.js').entityPlugin;
 
 require('/entities/gadget.js');
