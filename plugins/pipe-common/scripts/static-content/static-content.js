@@ -10,7 +10,9 @@ var staticContent = (function () {
     };
 
     app.serve = function (req, res) {
+
         var log = new Log();
+
         var startIndex = req.getRequestURI().indexOf(publicDirectory);
         var fileToReturn = req.getRequestURI().substring(startIndex);
         var file = new File(fileToReturn);
