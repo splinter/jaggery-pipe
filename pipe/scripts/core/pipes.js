@@ -13,13 +13,14 @@ Description: The following script implements a simple middleware stack similar t
 var pipes = {};
 
 (function () {
+    'use strict';
 
     var plugins = [];
 
     var DEFAULT_ROUTE = '/';
     var context = DEFAULT_ROUTE;
     var ANON_HANDLER = 'anon';
-    var log = Log();
+    var log = new Log();
     var emptyHandler = function (req, res, session, handlers) {
         handlers();
     };
@@ -181,7 +182,11 @@ var pipes = {};
      */
     var getPlugin = function (name, route) {
         var plugin;
-        var route = route || DEFAULT_ROUTE;
+
+        if(!route) {
+          route = DEFAULT_ROUTE;
+        }
+
         for (var index in plugins) {
             plugin = plugins[index];
 
@@ -221,7 +226,7 @@ var pipes = {};
         if(obj.hasOwnProperty('init')){
             obj.init(this);
         }
-    }
+    };
 
     pipes.handle = handle;
     pipes.plug = install;
