@@ -129,6 +129,8 @@ The static content plug-in serves static content from a user defined directory.I
    
 ```
 
+It is a good idea to plugin the static content plug-in further up the chain of the pipe plugins.This would ensure that less plugins are hit before the content is served.
+
 
 Writing a plug-in
 =================
