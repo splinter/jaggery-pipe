@@ -98,7 +98,7 @@ In addition to using the print statement,the router plug-in can use a renderer t
        msg: 'Hello, I am a json object'
      };
      
-     res._render(data);
+     res.render(data);
   }
 ```
 You can also set your own renderer per request method type;
@@ -131,6 +131,24 @@ The static content plug-in serves static content from a user defined directory.I
 
 It is a good idea to plugin the static content plug-in further up the chain of the pipe plugins.This would ensure that less plugins are hit before the content is served.
 
+Body Parser Plug-in
+-------------------
+The body parse plug-in will process the request body and make the content available either as a JSON object or a string.The body can be accessed using ;
+
+```javascript
+  req.body
+```
+
+The plug-in is bundled with the pipe-common module.
+
+
+Query Parser Plug-in
+--------------------
+The query parser plug-in will process a query string and make it available as a JSON object.The query string can be accessed using;
+
+```javascript
+  req.query
+```
 
 Writing a plug-in
 =================
