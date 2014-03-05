@@ -37,12 +37,12 @@ var exec = (function () {
             for (var index in route) {
                 routeComponent = route[index];
                 routes[method][routeComponent] = {};
-                routes[method][routeComponent]['handle'] = handler;
+                routes[method][routeComponent].handle = handler;
             }
         }
         else {
-            routes[method][route] ={}
-            routes[method][route]['handle']=handler;
+            routes[method][route] ={};
+            routes[method][route].handle=handler;
         }
 
     };
@@ -93,11 +93,11 @@ var exec = (function () {
             if (route == originalRoute) {
                 //Check if overrides exist
                 if (!routeMapping.hasOwnProperty('overrides')) {
-                    routeMapping['overrides'] = [];
+                    routeMapping.overrides = [];
                 }
                 var entry={};
-                entry['route']=newRoute;
-                entry['handle']=obj;
+                entry.route=newRoute;
+                entry.handle=obj;
                 routeMapping.overrides.push(entry);
             }
         }
