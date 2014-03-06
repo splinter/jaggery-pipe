@@ -8,7 +8,7 @@ function hasOwnProperty(obj, element) {
 }
 
 /*
-* ECMA s*/
+* ECMA Standard (ECMA-262 : 5.1 Edition)*/
 function decodes(encodedURI) {
     return decodeURIComponent(encodedURI);
 };
