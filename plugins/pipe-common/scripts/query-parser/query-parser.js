@@ -30,34 +30,29 @@ var queryParser = (function () {
             assign = assign || '=';
             var obj = {},
                 compoArray = [];
-
-            var decodedURI = decodes(queryString);
+            
+            decodedURI = decodes(querystring);
 
             decodedURI.split(sep).forEach(function(comp) {
+
                 comp.split(assign).some(function(element, index, array) {
                     if(hasOwnProperty(obj, element.toString())) {
 
                         compoArray.push(obj[element]);
-                        compoArray.push(array[1])
+                        compoArray.push(array[1]);
 
-                        Object.defineProperty(obj, element.toString(), {
-                            enumerable:true,
-                            configurable:false,
-                            writable:false,
-                            value:compoArray
-                        });
+                        obj[element] = compoArray;
                     } else {
-                        Object.defineProperty(obj, element.toString(), {
-                            enumerable:true,
-                            configurable:false,
-                            writable:false,
-                            value:array[1]
-                        });
-                    }
-                    return true;
+                        Object.defineProperty(obj, element, {
+                        enumerable:true,
+                        writable:true,
+                        value:array[1]
                 });
-            });
-            return obj;
+            }
+            return true;
+        });
+    });
+    return obj;
         }
 
         handlers();
