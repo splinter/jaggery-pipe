@@ -37,7 +37,6 @@ var queryParser = (function () {
 
                 comp.split(assign).some(function(element, index, array) {
                     if(hasOwnProperty(obj, element.toString())) {
-
                         compoArray.push(obj[element]);
                         compoArray.push(array[1]);
 
