@@ -69,12 +69,19 @@ var exec = (function (RouteMap) {
         register(PUT_METHOD,route,handler);
     };
 
-    app.del=function(route,handler){
+    app.delete=function(route,handler){
         register(DELETE_METHOD,route,handler);
     };
 
     app.post=function(route,handler){
         register(POST_METHOD,route,handler);
+    };
+
+    app.all=function(route,handler){
+        register(GET_METHOD,route,handler);
+        register(PUT_METHOD,route,handler);
+        register(POST_METHOD,route,handler);
+        register(DELETE_METHOD,route,handler);
     };
 
     app.route=function(req,res,session){
