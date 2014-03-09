@@ -3,6 +3,21 @@
  * a JSON object that is accessible to other plug-ins through req._query
  * Filename: query-parser.js
  */
+function hasOwnProperty(obj, element) {
+    return Object.prototype.hasOwnProperty.call(obj, element);
+}
+
+/*
+* ECMA Standard (ECMA-262 : 5.1 Edition)*/
+function decodes(encodedURI) {
+    return decodeURIComponent(encodedURI);
+};
+
+/*Serializes an object containing name:value pairs into a query string:
+ @param  fields    object contain URI component as key value pairs.
+ @param  separator separator of URIComponent                  [optional, default - &]
+ @param  assigner  assigner of key value pairURI Component    [optional, default - =]*/
+
 var queryParser = (function () {
 
     var handle = function (req, res, session, handlers) {
@@ -11,18 +26,33 @@ var queryParser = (function () {
 
         if (queryString) {
 
-            //Split into pairs
-            var pairs = queryString.split('&');
-            var kv;
-            var data = {};
+            sep = sep || '&';
+            assign = assign || '=';
+            var obj = {},
+                compoArray = [];
+            
+            decodedURI = decodes(querystring);
 
-            for (var index in pairs) {
-                kv = pairs[index].split('=');
-                data[kv[0]] = kv[1] || '';
+            decodedURI.split(sep).forEach(function(comp) {
+                
+                comp.split(assign).some(function(element, index, array) {
+                    
+                    if(hasOwnProperty(obj, element.toString())) {
+                        compoArray.push(obj[element]);
+                        compoArray.push(array[1]);
+
+                        obj[element] = compoArray;
+                    } else {
+                        Object.defineProperty(obj, element, {
+                        enumerable:true,
+                        writable:true,
+                        value:array[1]
+                });
             }
-
-            req.query = data;
-
+            return true;
+        });
+    });
+    return obj;
         }
 
         handlers();
