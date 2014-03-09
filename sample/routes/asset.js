@@ -12,7 +12,7 @@ var getTopAssets = function (req, res, session) {
 var getAsset = function (req, res, session) {
     var data={
         id: req.params.id,
-        name: 'test-' + req._params.type
+        name: 'test-' + req.params.type
     };
     //print('Overriden');
     res.render('getAsset',data);

@@ -44,7 +44,6 @@ router.app.get('/user/logout',user.logoutUser);
 router.app.get(['/t/:tenant/asset/:type/top', '/asset/:type/top'], asset.getTopAssets);
 router.app.get(['/t/:tenant/asset/:type/:id', '/asset/:type/:id'], asset.getAsset);
 
-
 router.app.get('/asset/:type/sample',asset.getAssetSample);
 //The documents are publicly available to anyone,so no basic auth
 router.app.get('/document/:type/:id', document.getDocument);
