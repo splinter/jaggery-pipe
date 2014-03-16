@@ -47,6 +47,7 @@ var final;
      */
     var resolveParams = function (args) {
         var params = {};
+        var log=new Log();
         params[PARAM_HANDLER_NAME] = ANON_HANDLER;
         params[PARAM_HANDLER_FUNCTION] = emptyHandler;
 
@@ -73,15 +74,18 @@ var final;
      * The function attaches the source based on the argument type
      * @param arg
      */
-    var resolveSource = function (arg) {
-        if (arg instanceof Function) {
-            return arg;
+    var resolveSource = function (src) {
+        var log=new Log();
+        if (src instanceof Function) {
+            log.info('Is a function');
+            return src;
         }
-        else if (arg instanceof Object) {
-            if (!arg.handle) {
+        else if (src instanceof Object) {
+            if (!src[PARAM_HANDLER_FUNCTION]) {
                 throw "The plugin has no handle method";
             }
-            return arg.handle;
+            log.info('Is an object');
+            return src.handle;
         }
         else {
             throw "The plugin must be either a function or object with a handle method";
@@ -117,7 +121,7 @@ var final;
      */
     var resolveHandler = function (params) {
         var source = params[PARAM_HANDLER_SOURCE];
-        var handler = source.hasOwnProperty(PARAM_HANDLER_FUNCTION) ? source[PARAM_HANDLER_FUNCTION] : emptyHandler;
+        var handler = resolveSource(source);//source.hasOwnProperty(PARAM_HANDLER_FUNCTION) ? source[PARAM_HANDLER_FUNCTION] : emptyHandler;
         params[PARAM_HANDLER_FUNCTION] = handler;
     };
 
@@ -151,10 +155,10 @@ var final;
      The function is used to install a new plug-in
      */
     var install = function () {
+
         var params = resolveParams(arguments);
         resolveHandlerName(params);
         resolveHandler(params);
-        // params['isRoute']=isRouteHandled;
         plugins.push(params);
     };
 
