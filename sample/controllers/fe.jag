@@ -50,7 +50,7 @@ router.app.get('/document/:type/:id', document.getDocument);
 
 router.app.get('/asset/api/:id',api.getApi);
 
-pipe.resolve(request,response,session);
+//pipe.resolve(request,response,session);
 
 
 
@@ -119,5 +119,16 @@ log.info(test2.toJSON());
 log.info(test3.toJSON());
 log.info(test4.toJSON());
 //log.info(firstAsset.logType);   */
+
+var fiber=require('/modules/fiber.js').fiber;
+var fLogger=require('/extensions/fiber-plugins/fiber-logger.js').logger;
+fiber.plugin(fLogger);
+
+fiber.register('/extensions/fiber-extensions/assetService');
+fiber.register('/extensions/fiber-extensions/front-page');
+fiber.register('/extensions/fiber-extensions/registryService');
+
+fiber.list('front-page');
+fiber.init();
 
 %>

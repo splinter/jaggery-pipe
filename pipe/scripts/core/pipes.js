@@ -1,14 +1,14 @@
 /*
-Description: The following script implements a simple middleware stack similar to connect.js
-             In fact, the implementation was heavily inspired by the above mentioned library.
-             It involves an array of plug-ins (equivalent to middleware) to be executed one after the
-             other based on matching routes.
-             A set of default plug-ins are provided in the plug-ins folder of this module.
-             These include:
-             1. A simple routing plug-in aptly called simpleRouter
-             2, A request logging plug-in which simply logs the request to the console  (simpleRequestLogger)
-             3. A tenant parser which parses the url to identify tenantId (assuming the tenant url is {context}/t/{tid}
-                (simpleTenantParser)
+ Description: The following script implements a simple middleware stack similar to connect.js
+ In fact, the implementation was heavily inspired by the above mentioned library.
+ It involves an array of plug-ins (equivalent to middleware) to be executed one after the
+ other based on matching routes.
+ A set of default plug-ins are provided in the plug-ins folder of this module.
+ These include:
+ 1. A simple routing plug-in aptly called simpleRouter
+ 2, A request logging plug-in which simply logs the request to the console  (simpleRequestLogger)
+ 3. A tenant parser which parses the url to identify tenantId (assuming the tenant url is {context}/t/{tid}
+ (simpleTenantParser)
  */
 //var pipes = {};
 var plug;
@@ -16,10 +16,13 @@ var initialize;
 var resolve;
 var list;
 var o;
+var final;
 
 (function () {
 
     var plugins = [];
+    var finalHandler = function () {
+    };   //An empty final handler,does nothing
 
     var DEFAULT_ROUTE = '/';
     var context = DEFAULT_ROUTE;
@@ -56,6 +59,29 @@ var o;
         }
 
         return params;
+    };
+
+    var setFinal = function (handler) {
+        finalHandler = handler;
+    };
+
+    /**
+     * The function attaches the source based on the argument type
+     * @param arg
+     */
+    var resolveSource = function (arg) {
+        if (arg instanceof Function) {
+            return arg;
+        }
+        else if (arg instanceof Object) {
+            if (!arg.handle) {
+                throw "The plugin has no handle method";
+            }
+            return arg.handle;
+        }
+        else {
+            throw "The plugin must be either a function or object with a handle method";
+        }
     };
 
     /*
@@ -129,24 +155,23 @@ var o;
     };
 
     /*
-    The function is used to handle a request by passing it through a chain of
-    plug-ins.
+     The function is used to handle a request by passing it through a chain of
+     plug-ins.
      */
-    var handle = function (req, res, session,context) {
+    var handle = function (req, res, session, context) {
         var log = new Log();
 
         var plugin;
         var index = 0;
-        var url=req.getRequestURI();
-        url=url.replace(context,'');
+        var url = req.getRequestURI();
+        url = url.replace(context, '');
         var currentPlugin;
         var recursiveHandle = function (err) {
 
             currentPlugin = plugins[index];
             index++;
             //Skip the use of plug-ins if the routes do not match
-            if((currentPlugin)&&(url.indexOf(currentPlugin.route)<0))
-            {
+            if ((currentPlugin) && (url.indexOf(currentPlugin.route) < 0)) {
                 return recursiveHandle(err);
             }
 
@@ -161,7 +186,7 @@ var o;
                 //Check if there is an error to be handled
                 if (err) {
                     //Check if the current plugin can handle the error!
-                    if (currentPlugin.handle.length == 5){
+                    if (currentPlugin.handle.length == 5) {
                         currentPlugin.handle(err, req, res, session, recursiveHandle);
                     }
                     //Throw the error again!
@@ -178,6 +203,8 @@ var o;
         };
 
         recursiveHandle();
+        finalHandler(req, res, session);
+
     };
 
     /*
@@ -201,7 +228,7 @@ var o;
      The function is used to override a specific plugin
      */
     var override = function () {
-        var log=new Log();
+        var log = new Log();
         var params = resolveParams(arguments);
         var route = params[PARAM_HANDLER_ROUTE] || DEFAULT_ROUTE;
         var overriddenPluginName = getOverridingPluginName(params);
@@ -220,10 +247,10 @@ var o;
     };
 
     /*
-    The function is used to initialize the pipe by calling an init method found in the object
+     The function is used to initialize the pipe by calling an init method found in the object
      */
-    var init=function(obj){
-        if(obj.hasOwnProperty('init')){
+    var init = function (obj) {
+        if (obj.hasOwnProperty('init')) {
             obj.init(this);
         }
     }
@@ -234,10 +261,11 @@ var o;
     //pipes.listAllHandlers = debugListAllHandlers;
     //pipes.init=init;
 
-      resolve=handle;
-      plug=install;
-      o=override;
-      list=debugListAllHandlers;
-      initialize=init;
+    resolve = handle;
+    plug = install;
+    o = override;
+    list = debugListAllHandlers;
+    initialize = init;
+    final = setFinal;
 
 }());

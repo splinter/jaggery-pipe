@@ -1,0 +1,13 @@
+{
+    "version":"1.0.0",
+
+    "extensions":{
+
+        "pages":["front-page"],
+
+        "themes":["sampleTheme"],
+
+        "services":["registryService","assetService:2.0.0"]
+
+    }
+}
