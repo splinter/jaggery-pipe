@@ -14,7 +14,7 @@ var bodyParser = (function () {
 
         //Only parse if the user has provided any application/json content
         if((content)&&(contentType=='application/json')){
-           contentObj=parse(content);
+           contentObj=content;
         }
 
         req.body=contentObj;

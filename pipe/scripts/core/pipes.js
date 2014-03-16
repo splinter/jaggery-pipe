@@ -61,6 +61,10 @@ var final;
         return params;
     };
 
+    /**
+     * The function is used to set a function which will executed after all of the plugins
+     * @param handler The handler that will be executed after all of the handlers
+     */
     var setFinal = function (handler) {
         finalHandler = handler;
     };
@@ -176,18 +180,24 @@ var final;
             }
 
             //Check if we have reached the end of the plugin chain
-            if (index > plugins.length) {
+            if (!currentPlugin) {
                 if (err) {
                     log.debug('No error handlers have been specified - and we have reached the end of the plug-in chain!');
                 }
 
             } else {
-                //isRouteHandled(req,'store',currentPlugin.route);
                 //Check if there is an error to be handled
                 if (err) {
                     //Check if the current plugin can handle the error!
                     if (currentPlugin.handle.length == 5) {
-                        currentPlugin.handle(err, req, res, session, recursiveHandle);
+                        //currentPlugin.handle(err, req, res, session, recursiveHandle);
+
+                        //Execute the handler within a try block so we can catch any errors
+                        try {
+                            currentPlugin.handle(err, req, res, session, recursiveHandle);
+                        } catch (e) {
+                            recursiveHandle(e);
+                        }
                     }
                     //Throw the error again!
                     else {
@@ -196,7 +206,18 @@ var final;
                 } else { //No error , but we still need to execute the current plugin logic
 
                     if (currentPlugin.handle.length < 5) {
-                        currentPlugin.handle(req, res, session, recursiveHandle);
+                        //currentPlugin.handle(req, res, session, recursiveHandle);
+
+                        //Execute within a try catch to allow errors to be propergated by error handlers
+                        try {
+                            currentPlugin.handle(req, res, session, recursiveHandle);
+                        } catch (e) {
+                            recursiveHandle(e);
+                        }
+                    }
+                    else {
+                        //If this is an error handler we need to omit it and move to the next handler
+                        recursiveHandle();
                     }
                 }
             }
