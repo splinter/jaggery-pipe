@@ -45,7 +45,7 @@ The pipe also allows some final logic to be plugged in via the final method;
   });
 ```
 
-#### Plugin in a function
+#### Plug a function
 In addition to plugins , you can also plug functions;
 
 ```javascript
