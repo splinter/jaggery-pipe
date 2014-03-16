@@ -45,6 +45,21 @@ The pipe also allows some final logic to be plugged in via the final method;
   });
 ```
 
+#### Plugin in a function
+In addition to plugins , you can also plug functions;
+
+```javascript
+  
+  pipe.plug(function(req,res,session,handlers){
+    handlers();
+  });
+  
+  //To register a function which will be invoked when an error occurs
+  pipe.plug(function(err,req,res,session,handlers){
+    handlers(err);
+  });
+```
+
 Plug-ins
 ========
 Jaggery-Pipe ships with a few default plugins that allow you to get up and running with a basic application in little time as possible. This section will explore a few of the plugins that perform common application logic.
