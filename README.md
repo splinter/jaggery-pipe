@@ -40,7 +40,7 @@ The common.logger is a plug-in which simply logs the request to the console.The 
 The pipe also allows some final logic to be plugged in via the final method;
 
 ```javascript
-  pipe.final(function(){
+  pipe.final(function(req,res,session){
       //This logic will be executed for all requests that are passed into the pipe
   });
 ```
