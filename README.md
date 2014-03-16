@@ -64,7 +64,7 @@ If you navigate to ; yourapp/hello you will be greeted by 'Hello World!'.
 **fe.jag**:
 ```javascript
   router.app.get('/hello/:user',function(req){
-    print('Hello '+req._params.user+'. How are you?');
+    print('Hello '+req.params.user+'. How are you?');
   });
 ```
 
@@ -75,7 +75,7 @@ Although this is perfectly fine for smaller apps,having callbacks declared with 
 **hello.js**:
 ```javascript
    var sayHello=function(req){
-      print('Hello '+req._params.user+'. How are you?');
+      print('Hello '+req.params.user+'. How are you?');
    };
 ```
 
