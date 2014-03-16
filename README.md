@@ -32,12 +32,18 @@ The above code states that the router plug-in should be used for all requests. L
 ```javascript
   var common=require('pipe-common');
   
-  pipe.plug('/friends'common.logger);
+  pipe.plug('/friends',common.logger);
 ```
 
 The common.logger is a plug-in which simply logs the request to the console.The above piece of code would log any request that contains the '/friend' component.
 
+The pipe also allows some final logic to be plugged in via the final method;
 
+```javascript
+  pipe.final(function(){
+      //This logic will be executed for all requests that are passed into the pipe
+  });
+```
 
 Plug-ins
 ========
