@@ -4,25 +4,61 @@
  * by other handlers
  * Filename:body-parser.js
  */
+
+function decodes(encodedURI) {
+    return decodeURIComponent(encodedURI);
+};
+
 var bodyParser = (function () {
 
     var handle = function (req, res, session, handlers) {
 
-        var content=req.getContent();
-        var contentObj=content;
-        var contentType=request.getContentType()||'';
+        var content = req.getContent();
+        var contentObj = content;
+        var contentType = request.getContentType()||'';
 
-        //Only parse if the user has provided any application/json content
-        if((content)&&(contentType=='application/json')){
-           contentObj=parse(content);
+        //parse if the user has provided any application/json content
+        if((content) && (contentType=='application/json')) {
+           contentObj = parse(content);
         }
 
-        req.body=contentObj;
+        //parse if the user has provided any application/x-www-form-urlencoded
+        if((content) && (contentType=='application/x-www-form-urlencoded')) {
+            if(content) {
+                var decodedURI = decodes(querystring),
+                                 compoArray = [],
+                                 obj = {};
+
+                decodedURI.split('&').forEach(function(comp) {
+
+                    comp.split('=').some(function(element, index, array) {
+
+                        if(hasOwnProperty(obj, element.toString())) {
+                            compoArray.push(obj[element]);
+                            compoArray.push(array[1]);
+
+                            obj[element] = compoArray;
+                        } else {
+                            Object.defineProperty(obj, element, {
+                                enumerable:true,
+                                writable:true,
+                                value:array[1]
+                            });
+                        }
+                        return true;
+                    });
+                });
+                contentObj = obj;
+            }
+        }
+
+        req.body = contentObj;
 
         handlers();
     };
 
-    return{
+    return {
         handle: handle
     }
+
 }());

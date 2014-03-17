@@ -25,6 +25,8 @@ function decodes(encodedURI) {
 
 var queryParser = function (option) {
 
+    var obj = {};
+
     var handle = function (req, res, session, handlers) {
 
         var queryString = req.getQueryString(),
@@ -38,10 +40,9 @@ var queryParser = function (option) {
 
             var sep = opt.sep || '&',
                 assign = opt.assign || '=';
-                obj = {},
                 compoArray = [];
             
-            decodedURI = decodes(querystring);
+            var decodedURI = decodes(querystring);
 
             decodedURI.split(sep).forEach(function(comp) {
                 
@@ -57,12 +58,12 @@ var queryParser = function (option) {
                         enumerable:true,
                         writable:true,
                         value:array[1]
+                        });
+                    }
+                    return true;
                 });
-            }
-            return true;
-        });
-    });
-    return obj;
+             });
+            req.query = obj;
         }
 
         handlers();
