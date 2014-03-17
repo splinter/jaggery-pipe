@@ -28,7 +28,7 @@ var queryParser = (function () {
 
             var sep = sep || '&',
                 assign = assign || '=';
-            var obj = {},
+                obj = {},
                 compoArray = [];
             
             decodedURI = decodes(querystring);
