@@ -4,6 +4,10 @@
  * by other handlers
  * Filename:body-parser.js
  */
+ 
+function hasOwnProperty(obj, element) {
+    return Object.prototype.hasOwnProperty.call(obj, element);
+}
 
 function decodes(encodedURI) {
     return decodeURIComponent(encodedURI);
