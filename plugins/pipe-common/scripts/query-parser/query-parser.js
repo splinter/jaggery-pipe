@@ -7,6 +7,10 @@ function hasOwnProperty(obj, element) {
     return Object.prototype.hasOwnProperty.call(obj, element);
 }
 
+function isObject(object){
+    return typeof object === 'object';   
+}
+
 /*
 * ECMA Standard (ECMA-262 : 5.1 Edition)*/
 function decodes(encodedURI) {
@@ -14,20 +18,26 @@ function decodes(encodedURI) {
 };
 
 /*Serializes an object containing name:value pairs into a query string:
- @param  fields    object contain URI component as key value pairs.
  @param  separator separator of URIComponent                  [optional, default - &]
- @param  assigner  assigner of key value pairURI Component    [optional, default - =]*/
+ @param  assigner  assigner of key value pairURI Component    [optional, default - =]
+ @param opt - above options must be provided with opt object
+ */
 
-var queryParser = (function () {
+var queryParser = function (option) {
 
     var handle = function (req, res, session, handlers) {
 
-        var queryString = req.getQueryString();
+        var queryString = req.getQueryString(),
+            opt = {};
+            
+        if(isObject(option)) {
+            opt = option;
+        }     
 
         if (queryString) {
 
-            var sep = sep || '&',
-                assign = assign || '=';
+            var sep = opt.sep || '&',
+                assign = opt.assign || '=';
                 obj = {},
                 compoArray = [];
             
@@ -61,4 +71,4 @@ var queryParser = (function () {
     return {
         handle: handle
     }
-}());
+};
