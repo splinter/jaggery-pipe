@@ -26,8 +26,8 @@ var queryParser = (function () {
 
         if (queryString) {
 
-            sep = sep || '&';
-            assign = assign || '=';
+            var sep = sep || '&',
+                assign = assign || '=';
             var obj = {},
                 compoArray = [];
             
