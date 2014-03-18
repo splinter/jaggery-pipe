@@ -33,7 +33,7 @@ log.info('env: '+common.errHandler.env());
 //router.app.config({inheritRoutes:true});
 router.app.utils('get-renderer',caramelRenderer.render);
 
-router.app.del('/user', user.logoutUser);
+router.app.delete('/user', user.logoutUser);
 router.app.post('/asset/:type',asset.postAsset);
 router.app.put('/asset/:type/:id',asset.putAsset);
 router.app.get('/asset/api/top',api.getTopApis);
@@ -44,14 +44,13 @@ router.app.get('/user/logout',user.logoutUser);
 router.app.get(['/t/:tenant/asset/:type/top', '/asset/:type/top'], asset.getTopAssets);
 router.app.get(['/t/:tenant/asset/:type/:id', '/asset/:type/:id'], asset.getAsset);
 
-
 router.app.get('/asset/:type/sample',asset.getAssetSample);
 //The documents are publicly available to anyone,so no basic auth
 router.app.get('/document/:type/:id', document.getDocument);
 
 router.app.get('/asset/api/:id',api.getApi);
 
-pipe.resolve(request,response,session);
+//pipe.resolve(request,response,session);
 
 
 
@@ -120,5 +119,16 @@ log.info(test2.toJSON());
 log.info(test3.toJSON());
 log.info(test4.toJSON());
 //log.info(firstAsset.logType);   */
+
+var fiber=require('/modules/fiber.js').fiber;
+var fLogger=require('/extensions/fiber-plugins/fiber-logger.js').logger;
+fiber.plugin(fLogger);
+
+fiber.register('/extensions/fiber-extensions/assetService');
+fiber.register('/extensions/fiber-extensions/front-page');
+fiber.register('/extensions/fiber-extensions/registryService');
+
+fiber.list('front-page');
+fiber.init();
 
 %>

@@ -17,9 +17,11 @@ var bodyParser = (function () {
         var contentObj = content;
         var contentType = request.getContentType()||'';
 
-        //parse if the user has provided any application/json content
-        if((content) && (contentType=='application/json')) {
-           contentObj = parse(content);
+
+        //Only parse if the user has provided any application/json content
+        if((content)&&(contentType=='application/json')){
+           contentObj=content;
+
         }
 
         //parse if the user has provided any application/x-www-form-urlencoded

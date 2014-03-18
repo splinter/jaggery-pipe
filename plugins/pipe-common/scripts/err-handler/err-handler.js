@@ -10,7 +10,7 @@ var errHandler=(function(){
         log.info('Entered error handler '+environment);
 
         if(environment==DEV){
-            res.sendError(err.code?err.code:500,err.msg?err.msg:'');
+            res.sendError(err.code?err.code:500,err.msg?err.msg:err.toString());
         }
         else{
             res.sendError(err.code?err.code:500,'Oops something has gone wrong');

@@ -1,0 +1,5 @@
+{
+    "name": "front-page",
+    "version": "1.0.0",
+    "consumes": ["assetService","registryService"]
+}

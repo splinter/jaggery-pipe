@@ -32,10 +32,34 @@ The above code states that the router plug-in should be used for all requests. L
 ```javascript
   var common=require('pipe-common');
   
-  pipe.plug('/friends'common.logger);
+  pipe.plug('/friends',common.logger);
 ```
 
 The common.logger is a plug-in which simply logs the request to the console.The above piece of code would log any request that contains the '/friend' component.
+
+#### Plug a function
+In addition to plugins , you can also plug functions;
+
+```javascript
+  
+  pipe.plug(function(req,res,session,handlers){
+    handlers();
+  });
+  
+  //To register a function which will be invoked when an error occurs
+  pipe.plug(function(err,req,res,session,handlers){
+    handlers(err);
+  });
+```
+#### Final function
+
+The pipe also allows some final logic to be plugged in via the final method;
+
+```javascript
+  pipe.final(function(req,res,session){
+      //This logic will be executed for all requests that are passed into the pipe
+  });
+```
 
 
 
@@ -64,7 +88,7 @@ If you navigate to ; yourapp/hello you will be greeted by 'Hello World!'.
 **fe.jag**:
 ```javascript
   router.app.get('/hello/:user',function(req){
-    print('Hello '+req._params.user+'. How are you?');
+    print('Hello '+req.params.user+'. How are you?');
   });
 ```
 
@@ -75,7 +99,7 @@ Although this is perfectly fine for smaller apps,having callbacks declared with 
 **hello.js**:
 ```javascript
    var sayHello=function(req){
-      print('Hello '+req._params.user+'. How are you?');
+      print('Hello '+req.params.user+'. How are you?');
    };
 ```
 
