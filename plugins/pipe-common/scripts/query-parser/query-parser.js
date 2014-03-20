@@ -39,10 +39,10 @@ var queryParser = function (option) {
         if (queryString) {
 
             var sep = opt.sep || '&',
-                assign = opt.assign || '=';
+                assign = opt.assign || '=',
                 compoArray = [];
             
-            var decodedURI = decodes(querystring);
+            var decodedURI = decodes(queryString);
 
             decodedURI.split(sep).forEach(function(comp) {
                 
