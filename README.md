@@ -163,6 +163,12 @@ The body parse plug-in will process the request body and make the content availa
   req.body
 ```
 
+If the request content type is multipart/form-data and if the user has uploaded any files they will be present in;
+
+```javascript
+  req.files
+```
+
 The plug-in is bundled with the pipe-common module.
 
 
