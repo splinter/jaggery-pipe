@@ -1,0 +1,3 @@
+var check=function(){
+
+};

@@ -1,41 +1,134 @@
 <%
 
-    var pipe=require('pipe');
-    var log=new Log();
-    log.info('Starting intialization');
-    var router= require('/extensions/universal/simpleRouter.js');
-    var caramelRenderer=require('/extensions/universal/caramelRenderer.js');
-    var asset=require('/routes/asset.js');
-    var api=require('/routes/api.js');
-    var basicAuth=require('/extensions/universal/basicAuth.js');
-    var errHandler= require('/extensions/universal/simpleErrorHandler.js')
-    pipe.pipes.init(require('/profiles/default.js'));
+var pipe = require('pipe');
+var log = new Log();
+var router = require('router');//require('/extensions/universal/simpleRouter.js');
+var common=require('pipe-common');
+var caramelRenderer = require('/extensions/universal/caramelRenderer.js');
+var asset = require('/routes/asset.js');
+var api = require('/routes/api.js');
+var user = require('/routes/user.js');
+var document = require('/routes/document.js');
+
+var myPlugin=require('/extensions/pipe-plugins/my-plugin.js');
+var myErrPlugin=require('/extensions/pipe-plugins/my-err-plugin.js');
+//pipe.pipes.init(require('/profiles/default.js'));
+//common.errHandler.env('production');
+//pipe.plug(common.basicAuth);
+//pipe.plug(common.logger);
+//var staticContent=require('/extensions/pipe-plugins/static-content-handler.js');
+common.staticContent.app.setDir('/themes/default/public');
+pipe.plug('/themes/default/public/',common.staticContent);
+pipe.plug(common.tenantParser);
+pipe.plug(common.bodyParser);
+pipe.plug(common.queryParser);
+
+pipe.plug(router);
+pipe.plug(common.errHandler);
 
 
-    pipe.pipes.plug(require('/extensions/universal/simpleTenantParser.js'));
-    pipe.pipes.plug('/asset/',basicAuth);   //Apply basic auth to routes starting with /asset/
-    pipe.pipes.plug(router);
-    pipe.pipes.plug(errHandler);
+log.info('env: '+common.errHandler.env());
+
+//Enable to allow routes to inherit from a parent route
+//router.app.config({inheritRoutes:true});
+router.app.utils('get-renderer',caramelRenderer.render);
+
+router.app.delete('/user', user.logoutUser);
+router.app.post('/asset/:type',asset.postAsset);
+router.app.put('/asset/:type/:id',asset.putAsset);
+router.app.get('/asset/api/top',api.getTopApis);
+//router.app.put('/asset/api/:id',api.putApi);
+router.app.get('/user/logout',user.logoutUser);
+
+//Setup some simple routes
+router.app.get(['/t/:tenant/asset/:type/top', '/asset/:type/top'], asset.getTopAssets);
+router.app.get(['/t/:tenant/asset/:type/:id', '/asset/:type/:id'], asset.getAsset);
+
+router.app.get('/asset/:type/sample',asset.getAssetSample);
+//The documents are publicly available to anyone,so no basic auth
+router.app.get('/document/:type/:id', document.getDocument);
+
+router.app.get('/asset/api/:id',api.getApi);
+
+//pipe.resolve(request,response,session);
 
 
 
-    errHandler.environment='production';
+/*var entity=require('entity');
+//var utils=require('/modules/utils.js');
+var entityLogger=require('/extensions/entity-plugins/entity-logger.js').entityPlugin;
 
-    router.app.get(['/{context}/asset/{type}/{id}','/{context}/asset/t/{tenant}/asset/{type}/{id}'],asset.getAsset);
-    router.app.put(['/{context}/asset/{type}/{id}','/{context}/asset/t/{tenant}/asset/{type}/{id}'],asset.updateAsset);
-    router.app.delete(['/{context}/asset/{type}/{id}','/{context}/asset/t/{tenant}/asset/{type}/{id}'],asset.deleteAsset);
-    router.app.post(['/{context}/asset/{type}/{id}','/{context}/asset/t/{tenant}/asset/{type}/{id}'],asset.createAsset);
+require('/entities/gadget.js');
 
-    router.app.get('/{context}/topassets/{type}',asset.topSuperTenantAsset);
-    router.app.get('/{context}/t/{tenant}/topassets/{type}',asset.topTenantAsset);
+var AssetSchema=new entity.Schema('Asset',{
+    id:Number,
+    name:String,
+    type:String,
+    path:{type:String, required:true,default:'_system'}
+});
 
-    router.app.overrideGet('/{context}/topassets/{type}','/{context}/topassets/api',api.apiTopAssets);
+AssetSchema.methods.sayHello=function(){
+    return 'Hello, my name is '+this.name;
+}
 
-   // router.app.get('/{context}/topassets',asset.overridenSuperTenantAsset);
+AssetSchema.static.getAllTypes=function(){
+    return ['gadgets','sites'] ;
+};
 
+AssetSchema.plugin(entityLogger,{title:'Tester'});
 
-    pipe.pipes.handle(request,response,session);
-   // var caramel=require('caramel');
-   // caramel.render({});
+var Asset=entity.model('Asset');
+
+//Asset.test\();
+
+var firstAsset=new Asset();
+firstAsset.name='John';
+
+var secondAsset=new Asset({name:'Smith', type:'Gadget'});
+
+log.info(secondAsset.sayHello());
+log.info(firstAsset.sayHello());
+
+secondAsset.save();
+log.info(Asset.getAllTypes());
+
+log.info(firstAsset.path);
+
+var Gadget=entity.model('Gadget');
+
+var gadget=new Gadget();
+
+gadget.install();
+
+gadget.save();
+gadget.remove();
+
+Gadget.find();
+Gadget.findOne();
+
+var test1=Gadget.create();
+var test2=Asset.create();
+var test3=Asset.create();
+var test4=Gadget.create();
+
+//var t=test();
+//t.name='Another Gadget';
+
+log.info(test1.toJSON());
+log.info(test2.toJSON());
+log.info(test3.toJSON());
+log.info(test4.toJSON());
+//log.info(firstAsset.logType);   */
+
+var fiber=require('/modules/fiber.js').fiber;
+var fLogger=require('/extensions/fiber-plugins/fiber-logger.js').logger;
+fiber.plugin(fLogger);
+
+fiber.register('/extensions/fiber-extensions/assetService');
+fiber.register('/extensions/fiber-extensions/front-page');
+fiber.register('/extensions/fiber-extensions/registryService');
+
+fiber.list('front-page');
+fiber.init();
 
 %>
