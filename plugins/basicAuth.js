@@ -9,8 +9,8 @@ var name = 'defaultBasicAuth';
 /*
 The default authenticator, a user can pass in their own function
  */
-var authenticator=function(session,arguments){
-    session.put("LOGGED_IN_USER", arguments.username);
+var authenticator=function(session,args){
+    session.put("LOGGED_IN_USER", args.username);
     session.put("Loged", "true");
     return true;
 };
@@ -18,7 +18,7 @@ var authenticator=function(session,arguments){
 /*
 The method is used to check if there is a logged in user.
  */
-var isLoggedIn=function(session,arguments){
+var isLoggedIn=function(session){
     var isLogged=session.get('Loged');
     if(isLogged){
         return true;
@@ -40,7 +40,7 @@ var decodeCredentials=function(authHeader){
 var challengeAuth=function(req,res){
     res.addHeader('WWW-Authenticate','Basic realm="restricted"');
     res.sendError(401);
-}
+};
 
 var handle = function (req, res, session, handlers) {
     var log = new Log();
