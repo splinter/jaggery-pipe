@@ -17,6 +17,8 @@ var staticContent = (function () {
         var fileToReturn = req.getRequestURI().substring(startIndex);
         var file = new File(fileToReturn);
 
+        log.info('STATIC CONTENT');
+        log.info(fileToReturn);
 
         if (!file.isExists()) {
             log.info('Could not locate the file!');
