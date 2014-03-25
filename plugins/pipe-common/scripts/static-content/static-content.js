@@ -1,17 +1,17 @@
-
-var staticContent = (function () {
+var staticContent = function (options) {
 
     var publicDirectory = '';
-    var defaultContentType='text/html';
-    var app = {};
+    var defaultContentType = 'text/html';
+    var options = options || {};
+    var log = new Log('static-content');
 
-    app.setDir = function (dir) {
-        publicDirectory = dir;
-    };
+    if(!options.dir){
+        log.warn('The static content plugin requires a directory to serve content from.');
+    }
 
-    app.serve = function (req, res) {
+    publicDirectory =options.dir||'';
 
-        var log = new Log();
+    var serve = function (req, res) {
 
         var startIndex = req.getRequestURI().indexOf(publicDirectory);
         var fileToReturn = req.getRequestURI().substring(startIndex);
@@ -41,7 +41,7 @@ var staticContent = (function () {
     };
 
     var handle = function (req, res, session, handlers) {
-        var isServed = app.serve(req, res);
+        var isServed = serve(req, res);
 
         //Throw an error if the resource could not be found
         if (!isServed) {
@@ -49,10 +49,7 @@ var staticContent = (function () {
         }
     };
 
-    return{
-        handle:handle,
-        app:app
-    }
+    return handle;
 
 
-}());
+};
