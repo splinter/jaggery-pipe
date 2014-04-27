@@ -79,10 +79,10 @@ var module = (function () {
                 //Save the default route location in order to allow back tracking
                 stack.push({parent:def,ptr:index});
             }
-            log.info('component: '+comp);
+            log.debug('component: '+comp);
             //Determine if there is a specific match for the current component
             if (mapObj.hasOwnProperty(comp)) {
-                log.info('specific route');
+                log.debug('specific route');
                 return traverse(mapObj[comp], components, index, params,stack,config);
             }
             else {
@@ -102,11 +102,11 @@ var module = (function () {
 
                         return traverse(parentLayer.parent,components,index,params,stack,config);
                     }
-                    log.info('No default route');
+                    log.debug('No default route');
                     //If not then stop
                     return def;
                 }
-                log.info('Using default route: '+stringify(def));
+                log.debug('Using default route: '+stringify(def));
                 return traverse(def, components, index, params,stack,config);
             }
         }
