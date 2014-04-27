@@ -81,6 +81,9 @@ var bodyParser = (function () {
             case 'application/x-www-form-urlencoded':
                 contentObj=handleUrlEncodedForm(content);
                 break;
+            case 'application/x-www-form-urlencoded; charset=UTF-8':
+                contentObj=handleUrlEncodedForm(content);
+                break;
             default:
                 log.warn('Content type: '+contentType+' not handled by bodyParser');
                 contentObj=req.body||{}; //Only put an empty object if there is nothing already in the body
